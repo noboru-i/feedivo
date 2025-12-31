@@ -9,8 +9,6 @@ import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
 import '../../widgets/common/error_display.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../channel/channel_detail_screen.dart';
-import '../history/history_screen.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
@@ -119,12 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
               return ChannelCard(
                 channel: channel,
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (context) => ChannelDetailScreen(
-                        channel: channel,
-                      ),
-                    ),
+                  Navigator.pushNamed(
+                    context,
+                    '/channel-detail',
+                    arguments: channel,
                   );
                 },
               );
@@ -163,18 +159,12 @@ class _HomeScreenState extends State<HomeScreen> {
             break;
           case 1:
             // 履歴画面へ遷移
-            Navigator.of(context)
-                .push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => const HistoryScreen(),
-                  ),
-                )
-                .then((_) {
-                  // 履歴画面から戻ったときにホームをハイライト
-                  setState(() {
-                    _selectedIndex = 0;
-                  });
-                });
+            Navigator.pushNamed(context, '/history').then((_) {
+              // 履歴画面から戻ったときにホームをハイライト
+              setState(() {
+                _selectedIndex = 0;
+              });
+            });
           case 2:
             // 設定画面へ遷移
             Navigator.pushNamed(context, '/settings').then((_) {

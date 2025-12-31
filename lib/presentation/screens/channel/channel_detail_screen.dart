@@ -10,7 +10,6 @@ import '../../providers/video_provider.dart';
 import '../../widgets/common/error_display.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/video/video_list_item.dart';
-import '../video/video_player_screen.dart';
 
 /// チャンネル詳細画面
 /// チャンネル情報と動画リストを表示
@@ -111,12 +110,10 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         return VideoListItem(
                           video: video,
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (context) => VideoPlayerScreen(
-                                  video: video,
-                                ),
-                              ),
+                            Navigator.pushNamed(
+                              context,
+                              '/video-player',
+                              arguments: video,
                             );
                           },
                         );

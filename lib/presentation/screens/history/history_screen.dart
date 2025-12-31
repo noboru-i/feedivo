@@ -8,7 +8,6 @@ import '../../providers/auth_provider.dart';
 import '../../providers/playback_provider.dart';
 import '../../widgets/history/history_empty_state.dart';
 import '../../widgets/history/history_list_item.dart';
-import '../video/video_player_screen.dart';
 
 /// 視聴履歴画面
 class HistoryScreen extends StatefulWidget {
@@ -72,10 +71,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _navigateToVideo(Video video) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => VideoPlayerScreen(video: video),
-      ),
+    Navigator.pushNamed(
+      context,
+      '/video-player',
+      arguments: video,
     );
   }
 

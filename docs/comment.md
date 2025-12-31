@@ -30,3 +30,7 @@ firestoreのデータ構造とセキュリティルールについても、同�
 
 ## TODO 8
 drive.readonly から、 drive.file 権限の取得へ変更。
+
+## TODO 9
+https://docs.flutter.dev/tools/widget-previewer を参照して、
+lib/presentation/widgets/*.dart のpreviewを作成してください。

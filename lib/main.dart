@@ -15,6 +15,8 @@ import 'data/repositories/google_drive_repository.dart';
 import 'data/repositories/playback_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
+import 'domain/entities/channel.dart';
+import 'domain/entities/video.dart';
 import 'domain/repositories/channel_repository_interface.dart';
 import 'domain/repositories/google_drive_repository_interface.dart';
 import 'domain/repositories/playback_repository_interface.dart';
@@ -26,9 +28,12 @@ import 'presentation/providers/playback_provider.dart';
 import 'presentation/providers/video_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/channel/add_channel_screen.dart';
+import 'presentation/screens/channel/channel_detail_screen.dart';
+import 'presentation/screens/history/history_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/settings/settings_screen.dart';
 import 'presentation/screens/splash/splash_screen.dart';
+import 'presentation/screens/video/video_player_screen.dart';
 
 void main() async {
   // Flutter binding初期化
@@ -135,6 +140,35 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomeScreen(),
           '/settings': (context) => const SettingsScreen(),
           '/add-channel': (context) => const AddChannelScreen(),
+          '/history': (context) => const HistoryScreen(),
+        },
+
+        // 引数付きルートの生成
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/channel-detail':
+              final channel = settings.arguments as Channel?;
+              if (channel == null) {
+                return null;
+              }
+              return MaterialPageRoute(
+                builder: (context) => ChannelDetailScreen(channel: channel),
+                settings: settings,
+              );
+
+            case '/video-player':
+              final video = settings.arguments as Video?;
+              if (video == null) {
+                return null;
+              }
+              return MaterialPageRoute(
+                builder: (context) => VideoPlayerScreen(video: video),
+                settings: settings,
+              );
+
+            default:
+              return null;
+          }
         },
 
         // 未定義ルートのハンドリング
