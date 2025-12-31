@@ -9,18 +9,14 @@ import 'config/constants.dart';
 import 'config/theme/app_theme.dart';
 import 'core/analytics/analytics_service.dart';
 import 'data/repositories/auth_repository.dart';
-import 'data/repositories/channel_cache_repository.dart';
 import 'data/repositories/channel_repository.dart';
 import 'data/repositories/google_drive_repository.dart';
 import 'data/repositories/playback_repository.dart';
-import 'data/repositories/video_cache_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
-import 'domain/repositories/channel_cache_repository_interface.dart';
 import 'domain/repositories/channel_repository_interface.dart';
 import 'domain/repositories/google_drive_repository_interface.dart';
 import 'domain/repositories/playback_repository_interface.dart';
-import 'domain/repositories/video_cache_repository_interface.dart';
 import 'domain/repositories/video_repository_interface.dart';
 import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
@@ -40,6 +36,13 @@ void main() async {
   // Firebase初期化
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Firestoreオフライン永続化設定
+  // すべてのプラットフォーム（iOS/Android/Web）で有効
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
   runApp(const MyApp());
@@ -74,27 +77,17 @@ class MyApp extends StatelessWidget {
           create: (_) => AnalyticsService(),
         ),
 
-        // Phase 3: Cache Repositories
-        Provider<IChannelCacheRepository>(
-          create: (_) => ChannelCacheRepository(),
-        ),
-        Provider<IVideoCacheRepository>(
-          create: (_) => VideoCacheRepository(),
-        ),
-
-        // Phase 2: Repositories - Dependent on Cache
+        // Phase 2: Repositories
         // VideoRepository must be created before ChannelRepository
         Provider<IVideoRepository>(
           create: (context) => VideoRepository(
             firestore: FirebaseFirestore.instance,
-            cacheRepo: context.read<IVideoCacheRepository>(),
           ),
         ),
         Provider<IChannelRepository>(
           create: (context) => ChannelRepository(
             firestore: FirebaseFirestore.instance,
             driveRepo: context.read<IGoogleDriveRepository>(),
-            cacheRepo: context.read<IChannelCacheRepository>(),
             videoRepo: context.read<IVideoRepository>(),
           ),
         ),

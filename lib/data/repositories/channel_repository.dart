@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/errors/exceptions.dart';
 import '../../domain/entities/channel.dart';
-import '../../domain/repositories/channel_cache_repository_interface.dart';
 import '../../domain/repositories/channel_repository_interface.dart';
 import '../../domain/repositories/google_drive_repository_interface.dart';
 import '../../domain/repositories/video_repository_interface.dart';
@@ -13,27 +12,23 @@ import '../models/channel_model.dart';
 
 /// チャンネル管理のリポジトリ実装
 /// Google DriveとFirestoreを連携してチャンネルを管理
-/// オフライン対応のためSQLiteキャッシュを併用
+/// Firestoreのネイティブオフライン永続化を使用
 class ChannelRepository implements IChannelRepository {
   ChannelRepository({
     required FirebaseFirestore firestore,
     required IGoogleDriveRepository driveRepo,
-    required IChannelCacheRepository cacheRepo,
     required IVideoRepository videoRepo,
   }) : _firestore = firestore,
        _driveRepo = driveRepo,
-       _cacheRepo = cacheRepo,
        _videoRepo = videoRepo;
 
   final FirebaseFirestore _firestore;
   final IGoogleDriveRepository _driveRepo;
-  final IChannelCacheRepository _cacheRepo;
   final IVideoRepository _videoRepo;
 
   @override
   Future<List<Channel>> getChannels(String userId) async {
     try {
-      // Firestoreから取得
       final snapshot = await _firestore
           .collection('users')
           .doc(userId)
@@ -41,24 +36,10 @@ class ChannelRepository implements IChannelRepository {
           .orderBy('createdAt', descending: true)
           .get();
 
-      final channels = snapshot.docs
+      return snapshot.docs
           .map((doc) => ChannelModel.fromFirestore(doc).toEntity())
           .toList();
-
-      // キャッシュに保存
-      await _cacheRepo.saveChannels(channels);
-
-      return channels;
     } on Exception catch (e) {
-      // オフライン時はキャッシュから取得
-      try {
-        final cachedChannels = await _cacheRepo.getChannels(userId);
-        if (cachedChannels.isNotEmpty) {
-          return cachedChannels;
-        }
-      } on Exception {
-        // キャッシュも失敗した場合は元のエラーをスロー
-      }
       throw FirestoreException('チャンネル一覧の取得に失敗しました: $e');
     }
   }
@@ -116,12 +97,7 @@ class ChannelRepository implements IChannelRepository {
       // Firestoreに保存
       await channelRef.set(channelModel.toFirestore());
 
-      final channel = channelModel.toEntity();
-
-      // キャッシュに保存
-      await _cacheRepo.saveChannel(channel);
-
-      return channel;
+      return channelModel.toEntity();
     } on InvalidConfigException {
       rethrow;
     } on DriveApiException {
@@ -139,9 +115,6 @@ class ChannelRepository implements IChannelRepository {
 
       // チャンネルドキュメントを削除
       await _firestore.doc(channelId).delete();
-
-      // キャッシュから削除
-      await _cacheRepo.deleteChannel(channelId);
     } on Exception catch (e) {
       throw FirestoreException('チャンネルの削除に失敗しました: $e');
     }
@@ -192,12 +165,7 @@ class ChannelRepository implements IChannelRepository {
           'lastFetchedAt': Timestamp.fromDate(updatedModel.lastFetchedAt!),
         });
 
-        final channel = updatedModel.toEntity();
-
-        // キャッシュに保存
-        await _cacheRepo.saveChannel(channel);
-
-        return channel;
+        return updatedModel.toEntity();
       }
 
       // 更新がある場合は全情報を更新
@@ -217,12 +185,7 @@ class ChannelRepository implements IChannelRepository {
 
       await _firestore.doc(channelId).update(updatedModel.toFirestore());
 
-      final channel = updatedModel.toEntity();
-
-      // キャッシュに保存
-      await _cacheRepo.saveChannel(channel);
-
-      return channel;
+      return updatedModel.toEntity();
     } on InvalidConfigException {
       rethrow;
     } on DriveApiException {

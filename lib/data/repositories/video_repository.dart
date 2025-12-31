@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/video.dart';
-import '../../domain/repositories/video_cache_repository_interface.dart';
 import '../../domain/repositories/video_repository_interface.dart';
 import '../models/video_model.dart';
 
@@ -10,12 +9,9 @@ import '../models/video_model.dart';
 class VideoRepository implements IVideoRepository {
   VideoRepository({
     required FirebaseFirestore firestore,
-    required IVideoCacheRepository cacheRepo,
-  }) : _firestore = firestore,
-       _cacheRepo = cacheRepo;
+  }) : _firestore = firestore;
 
   final FirebaseFirestore _firestore;
-  final IVideoCacheRepository _cacheRepo;
 
   @override
   Future<List<Video>> getVideos(String channelId) async {
@@ -44,24 +40,10 @@ class VideoRepository implements IVideoRepository {
           .orderBy('publishedAt', descending: true)
           .get();
 
-      final videos = querySnapshot.docs
+      return querySnapshot.docs
           .map((doc) => VideoModel.fromFirestore(doc).toEntity())
           .toList();
-
-      // キャッシュに保存
-      await _cacheRepo.saveVideos(videos);
-
-      return videos;
     } on Exception {
-      // オフライン時はキャッシュから取得
-      try {
-        final cachedVideos = await _cacheRepo.getVideos(channelId);
-        if (cachedVideos.isNotEmpty) {
-          return cachedVideos;
-        }
-      } on Exception {
-        // キャッシュも失敗した場合は元のエラーをスロー
-      }
       rethrow;
     }
   }
@@ -113,9 +95,6 @@ class VideoRepository implements IVideoRepository {
           .doc(video.id);
 
       await videoRef.set(videoModel.toFirestore());
-
-      // キャッシュに保存
-      await _cacheRepo.saveVideo(video);
     } on Exception {
       rethrow;
     }
@@ -223,9 +202,6 @@ class VideoRepository implements IVideoRepository {
       for (final doc in videos.docs) {
         await doc.reference.delete();
       }
-
-      // キャッシュから削除
-      await _cacheRepo.deleteVideosByChannel(channelId);
     } on Exception {
       rethrow;
     }
