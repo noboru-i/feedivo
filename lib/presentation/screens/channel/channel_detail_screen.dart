@@ -7,6 +7,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../domain/entities/channel.dart';
 import '../../providers/channel_provider.dart';
 import '../../providers/video_provider.dart';
+import '../../widgets/common/error_display.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/video/video_list_item.dart';
 import '../video/video_player_screen.dart';
@@ -73,28 +74,9 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
         }
 
         if (videoProvider.errorMessage != null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: AppColors.errorColor,
-                ),
-                const SizedBox(height: AppDimensions.spacingM),
-                Text(
-                  videoProvider.errorMessage!,
-                  style: const TextStyle(color: AppColors.errorColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppDimensions.spacingM),
-                ElevatedButton(
-                  onPressed: _loadVideos,
-                  child: const Text('再試行'),
-                ),
-              ],
-            ),
+          return ErrorDisplay(
+            message: videoProvider.errorMessage!,
+            onRetry: _loadVideos,
           );
         }
 

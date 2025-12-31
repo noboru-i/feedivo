@@ -7,6 +7,7 @@ import '../../../core/analytics/analytics_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
+import '../../widgets/common/error_display.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../channel/channel_detail_screen.dart';
 import '../history/history_screen.dart';
@@ -91,28 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (channelProvider.errorMessage != null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: AppColors.errorColor,
-                ),
-                const SizedBox(height: AppDimensions.spacingM),
-                Text(
-                  channelProvider.errorMessage!,
-                  style: const TextStyle(color: AppColors.errorColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppDimensions.spacingM),
-                ElevatedButton(
-                  onPressed: _loadChannels,
-                  child: const Text('再試行'),
-                ),
-              ],
-            ),
+          return ErrorDisplay(
+            message: channelProvider.errorMessage!,
+            onRetry: _loadChannels,
           );
         }
 
