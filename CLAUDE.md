@@ -2,12 +2,14 @@
 
 このドキュメントは、ClaudeなどのAIアシスタントがFeedivoプロジェクトに関する作業を効率的に行うための包括的なコンテキスト情報を提供します。
 
+---
+
 ## 📌 プロジェクト概要
 
 ### コアコンセプト
 Feedivoは「Google Driveをポッドキャストのように楽しむ」というコンセプトの動画視聴アプリです。
-既存の動画プラットフォームやポッドキャストアプリとは異なり、以下の特徴的な組み合わせを実現します：
 
+**特徴**:
 1. **Google Driveホスティング**: 配信者が自分のGoogle Drive上に動画を保存
 2. **セルフマネージドRSSフィード**: JSONベースの設定ファイルで動画リストを管理
 3. **ポッドキャスト型視聴**: URLを登録するだけでコンテンツにアクセス
@@ -17,313 +19,231 @@ Feedivoは「Google Driveをポッドキャストのように楽しむ」とい�
 - **配信者**: 独自の動画コンテンツを簡易的に配信したい個人・小規模団体
 - **視聴者**: 特定の配信者のコンテンツを継続的に視聴したいユーザー
 
+---
+
+## 🎯 現在の開発状態
+
+### Phase 1-4完了（プロダクション準備完了）
+
+| Phase | 状態 | 主要機能 |
+|-------|------|---------|
+| Phase 1 | ✅ 完了 | 基盤構築、Google OAuth認証 |
+| Phase 2 | ✅ 完了 | チャンネル管理、動画再生、視聴位置保存 |
+| Phase 3 | ✅ 完了 | 視聴履歴、Analytics、オフライン対応 |
+| Phase 4 | ✅ 完了 | パフォーマンス最適化、エラーハンドリング統一 |
+
+**詳細**: `docs/archive/implementation-history.md`
+
+### 実装済み機能
+
+#### コア機能
+- ✅ Google認証（Firebase Authentication）
+- ✅ チャンネル追加・管理・削除
+- ✅ 動画リスト表示
+- ✅ 動画再生（再生速度変更対応）
+- ✅ 視聴位置の保存・復元
+
+#### 拡張機能
+- ✅ 視聴履歴管理
+- ✅ Firebase Analytics統合
+- ✅ オフライン対応（SQLiteキャッシュ）
+- ✅ バックグラウンド再生インフラ（iOS/Android設定済み）
+
+#### 品質・最適化
+- ✅ 画像キャッシュ最適化（CachedNetworkImage）
+- ✅ データ整合性の確保
+- ✅ エラーハンドリング統一
+- ✅ Lint 0エラー
+
+---
+
+## 🏗️ アーキテクチャ
+
+### Clean Architecture
+
+```
+lib/
+├── main.dart                          # エントリーポイント
+├── config/                            # 環境設定
+│   ├── constants.dart                 # アプリ定数
+│   └── theme/                         # Material Design 3テーマ
+├── core/                              # コア機能
+│   ├── analytics/                     # Firebase Analytics
+│   └── errors/                        # エラー定義
+├── domain/                            # ドメイン層
+│   ├── entities/                      # エンティティ
+│   └── repositories/                  # リポジトリインターフェース
+├── data/                              # データ層
+│   ├── models/                        # データモデル
+│   ├── repositories/                  # リポジトリ実装
+│   └── services/                      # 外部サービス連携
+└── presentation/                      # プレゼンテーション層
+    ├── providers/                     # 状態管理（Provider）
+    ├── screens/                       # 画面
+    └── widgets/                       # 再利用可能なウィジェット
+```
+
+### 主要な技術決定
+
+#### フレームワーク
+- **Flutter 3.38.5 / Dart 3.10.4**: クロスプラットフォーム開発
+- **Material Design 3**: UIデザインシステム
+- **Clean Architecture**: 層分離とテスタビリティ
+
+#### 状態管理
+- **Provider**: シンプルで効果的な状態管理
+
+#### バックエンド
+- **Firebase Authentication**: Google Sign-in
+- **Cloud Firestore**: データ永続化
+- **Firebase Analytics**: 利用状況分析
+
+#### ストレージ
+- **Google Drive API v3**: 動画・設定ファイル取得
+- **SQLite (sqflite)**: ローカルキャッシュ
+
+#### 動画・画像
+- **video_player, chewie**: 動画再生
+- **cached_network_image**: 画像キャッシュ
+
+---
+
 ## 🎨 デザインシステム
 
 ### ブランディング
 - **アプリ名**: Feedivo（フィーディーヴォ）
-  - コインドターム（造語）で商標衝突リスクが最小
-  - "Feed"（フィード）と"Video"（動画）の組み合わせ
+- **コンセプト**: "Feed" + "Video" の造語
 
 ### カラースキーム
 - **プライマリカラー**: Deep Navy (#1E3A5F)
-  - 落ち着いた、洗練された印象
-  - 長時間の視聴でも目に優しい
 - **デザインシステム**: Material Design 3準拠
 - **デザインフィロソフィー**: 穏やかで落ち着いた美的感覚
 
-### UI/UXモックアップ
-完成済みの画面モックアップが7つあり、インタラクティブプロトタイプも作成済み：
-1. スプラッシュ画面
-2. ログイン画面
-3. チャンネル一覧（ホーム）
-4. チャンネル追加
-5. 動画リスト
-6. 動画再生
-7. 設定画面
+---
 
-## 🏗️ アーキテクチャ決定記録
+## 🔧 開発ガイドライン
 
-### フレームワーク選定
-**Flutter選定理由**:
-- 真のクロスプラットフォーム（iOS/Android/Web）
-- 単一コードベースでの開発効率
-- Material Design 3の優れたサポート
-- 活発なエコシステム
+### コーディング原則
 
-### 認証スコープの重要な決定
+#### Clean Architecture準拠
+```
+Domain層  : エンティティ、リポジトリインターフェース
+Data層    : モデル、リポジトリ実装、サービス
+Presentation層: Provider、画面、ウィジェット
+```
 
-#### 検討された選択肢
-1. **drive.readonly** (現在の選択)
-   - 長所: セキュアで必要最小限の権限
-   - 短所: ユーザーが個別に各ファイルへのアクセスを承認する必要がある
-   
-2. **drive.file** (代替案)
-   - 長所: アプリが作成したファイルへの自動アクセス、スムーズなUX
-   - 短所: より広い権限、ユーザーの懸念を招く可能性
+#### Null Safety
+- Dartのnull安全性を最大限活用
+- 適切な`?`と`!`の使用
 
-#### 現在の方針
-- **Phase 1**: `drive.readonly` で実装開始
-- **理由**: セキュリティ優先、Google審査通過の容易性
-- **将来**: UX問題が深刻な場合は `drive.file` への移行を検討
-- **補完策**: Google Picker API統合でOAuth承認フローを簡素化
+#### エラーハンドリング
+- ユーザーフレンドリーなエラーメッセージ（`ErrorDisplay`ウィジェット）
+- 適切なログ記録（Firebase Analytics）
+- ネットワークエラーへの対応（オフラインキャッシュ）
 
-### データストレージ戦略
+#### パフォーマンス
+- 画像キャッシュ（`CachedNetworkImage`）
+- リスト最適化（`ListView.builder`）
+- Firestoreクエリの最小化（ローカルキャッシュ優先）
 
-#### Firestore構造
+### コード品質
+- **lint**: dart analyze --fatal-infos で0エラー
+- **format**: dart format で整形
+- **const**: 可能な限りconstコンストラクタを使用
+
+---
+
+## 📊 Firestoreデータ構造
+
 ```
 users/{userId}/
-  └── channels/{channelId}/
-      └── videos/{videoId}/
+  ├── channels/{channelId}/
+  │   ├── id, userId, name, description
+  │   ├── thumbnailFileId, configFileId
+  │   ├── createdAt, updatedAt, lastFetchedAt
+  │   └── videos/{videoId}/
+  │       ├── id, channelId, title, description
+  │       ├── videoFileId, thumbnailFileId
+  │       ├── duration, publishedAt
+  │       └── ...
+  └── playback_positions/{videoId}/
+      ├── videoId, channelId
+      ├── position, duration
+      ├── lastPlayedAt, isCompleted
+      └── watchPercentage
 ```
 
-**設計原則**:
-- ユーザーごとのデータ分離
-- 階層的なコレクション構造
-- オフライン同期対応
-
-#### ローカルDB (SQLite)
-- **用途**: オフライン対応とキャッシュ
-- **Firestoreとの役割分担**: 
-  - Firestore = マスターデータと同期
-  - SQLite = ローカルキャッシュと高速アクセス
-
-## 🔧 技術仕様
-
-### 主要パッケージ（バージョン管理）
-```yaml
-# 認証・Drive API
-google_sign_in: ^6.2.2  # 6.x系を採用（7.x系は破壊的変更あり）
-googleapis: ^15.0.0
-googleapis_auth: ^2.0.0
-
-# Firebase
-firebase_core: ^4.3.0
-firebase_auth: ^6.1.3
-cloud_firestore: ^6.1.1
-firebase_analytics: ^12.1.0
-
-# 動画再生（Phase 2で実装予定）
-# video_player: ^2.8.0
-# chewie: ^1.7.0
-
-# 状態管理
-provider: ^6.1.5+1
-```
-
-**注意**: google_sign_in 7.x系は認証フローが大幅に変更されているため、Phase 1では安定した6.x系を採用
-
-### Google Drive API統合
-
-#### 動画ストリーミング
-```dart
-// 認証付きストリーミングURL
-final videoUrl = 'https://www.googleapis.com/drive/v3/files/$fileId?alt=media';
-
-VideoPlayerController.network(
-  videoUrl,
-  httpHeaders: {
-    'Authorization': 'Bearer $accessToken',
-  },
-)
-```
-
-#### トークン管理
-- 自動リフレッシュメカニズムの実装必須
-- トークン期限切れのエラーハンドリング
-- 最新のGoogle OAuth 2.0パターンに従う
-
-### セキュリティルール
-
-#### Firestore Security Rules
+### Firestoreセキュリティルール
 ```javascript
-// ユーザーは自分のデータのみアクセス可能
 match /users/{userId} {
-  allow read, write: if request.auth != null 
+  allow read, write: if request.auth != null
                      && request.auth.uid == userId;
 }
 ```
 
-**原則**:
-- すべてのデータはユーザーごとに分離
-- 認証必須
-- 最小権限の原則
+---
 
-## 📊 開発フェーズと優先順位
-
-### Phase 1: 基盤構築（2-3週間）✅ **完了**
-**優先度**: 🔴 最高
-- [x] Flutterプロジェクトセットアップ
-- [x] Firebase初期設定（Auth, Firestore, Analytics）
-- [x] Google OAuth認証実装
-- [x] 基本的な画面レイアウト（モックアップに基づく）
-
-**完了事項**:
-- Clean Architecture構造の実装（Domain/Data/Presentation層）
-- Material Design 3テーマシステム
-- Firebase Authentication & Firestore セキュリティルール設定
-- Google Sign-in統合（google_sign_in 6.2.2）
-- 基本画面実装：Splash, Login, Home, Settings
-- Lint & Format対応（pedantic_mono準拠）
-- セキュリティ対応：秘匿情報の.gitignore化、テンプレートファイル作成
-- ドキュメント整備：Firebase/Google Cloudセットアップガイド
-
-### Phase 2: コア機能（3-4週間）⏳ **進行中**
-**優先度**: 🔴 最高
-
-**Phase 2-1: Google Drive API基盤とドメインモデル** ✅ **完了**
-- [x] Domain層: エンティティ作成（Channel, Video, PlaybackPosition, ChannelConfig）
-- [x] Domain層: リポジトリインターフェース作成（4リポジトリ）
-- [x] Core層: カスタム例外定義
-- [x] Data層: GoogleDriveService実装
-- [x] Data層: モデルクラス作成（4モデル）
-
-**Phase 2-2: チャンネル管理機能**（次のステップ）
-- [ ] Google Drive API連携
-- [ ] チャンネル追加・管理機能
-
-**Phase 2-3: 動画リスト表示**
-- [ ] 動画リスト表示
-
-**Phase 2-4: 動画再生機能（基本）**
-- [ ] 動画再生機能（基本）
-
-**Phase 2-5: 視聴位置の保存・復元**
-- [ ] 視聴位置の保存・復元
-
-**焦点**: 視聴者機能（配信者ツールは後回し）
-
-### Phase 3: 拡張機能（2-3週間）
-**優先度**: 🟡 中
-- [ ] 視聴履歴管理
-- [ ] バックグラウンド再生
-- [ ] オフライン対応（メタデータキャッシュ）
-- [ ] Firebase Analytics実装
-
-### Phase 4: 最適化・テスト（2週間）
-**優先度**: 🟢 通常
-- [ ] パフォーマンス最適化
-- [ ] UI/UX改善
-- [ ] 各プラットフォームでのテスト
-- [ ] バグ修正
-
-### 将来の拡張（Phase 5+）
-**優先度**: 🔵 低
-- オフライン動画ダウンロード
-- プレイリスト機能
-- 配信者向けツール（設定ファイル生成UI）
-- 通知機能
-- コメント機能
-
-## 🎯 実装ガイドライン
-
-### コーディング原則
-1. **Clean Architecture**: 層分離を厳守
-   - Presentation Layer (Screens/Widgets)
-   - Business Logic Layer (Providers/Services)
-   - Data Layer (Repositories/Models)
-
-2. **Null Safety**: Dartのnull安全性を最大限活用
-
-3. **エラーハンドリング**:
-   - ユーザーフレンドリーなエラーメッセージ
-   - 適切なログ記録（Firebase Crashlytics）
-   - ネットワークエラーへの対応
-   - Catch句には具体的な例外型を指定（`on Exception catch`）
-
-4. **Lint & Format**:
-   - `pedantic_mono` の厳格なルールに準拠
-   - `dart format` で自動フォーマット
-   - 無効化ルール：
-     - `avoid_print`: 開発中は許可
-     - `flutter_style_todos`: 標準TODOフォーマット使用
-     - `lines_longer_than_80_chars`: 可読性優先
-
-5. **テスト**:
-   - 単体テスト: ビジネスロジック
-   - ウィジェットテスト: UI コンポーネント
-   - 統合テスト: クリティカルフロー
-
-### パフォーマンス最適化
-- **画像キャッシュ**: `cached_network_image` 使用
-- **リスト最適化**: `ListView.builder` で遅延ロード
-- **Firestore読み取り最小化**: 
-  - ローカルキャッシュ優先
-  - リアルタイムリスナーは最小限に
-
-### Firebase Analytics イベント設計
-**主要トラッキングイベント**:
-```dart
-// チャンネル追加
-'channel_added' {channel_id, source}
-
-// 動画再生
-'video_play_start' {video_id, channel_id}
-'video_completed' {video_id, watch_duration}
-
-// ユーザーエンゲージメント
-'screen_view' {screen_name}
-```
-
-## 🚨 既知の制約と課題
+## 🔍 既知の制約と将来の拡張
 
 ### 技術的制約
-1. **Google Drive API制限**
-   - 1日あたり1,000,000リクエスト
-   - レート制限への対応が必要
 
-2. **Web版の制約**
-   - バックグラウンド再生の制限
-   - プッシュ通知非対応
-   - ローカルストレージ容量制限
+#### Google Drive API制限
+- 1日あたり1,000,000リクエスト
+- レート制限への対応が必要
 
-3. **動画ストリーミング**
-   - DRM保護コンテンツは再生不可
-   - 大容量動画の帯域幅考慮
+#### Web版の制約
+- バックグラウンド再生の制限
+- プッシュ通知非対応
 
-### UX課題と対応策
-1. **OAuth承認の煩雑さ**
-   - **課題**: `drive.readonly` では各ファイルごとに承認が必要
-   - **対応**: Google Picker API統合で改善
+#### バックグラウンド再生
+- インフラのみ実装済み（iOS/Android設定完了）
+- VideoPlayerScreenへの完全統合は未実施（技術的複雑度が高い）
+- 詳細: `docs/archive/phase3-4-background-playback.md`
 
-2. **初回セットアップの複雑さ**
-   - **対応**: チュートリアル画面の実装
-   - **対応**: エラーメッセージの明確化
+### 将来の拡張候補（Phase 5+）
 
-## 🔍 トラブルシューティング参考
+#### 追加機能
+- [ ] プレイリスト機能
+- [ ] 検索機能（チャンネル・動画）
+- [ ] コメント機能
+- [ ] 通知機能（新動画アップロード）
+- [ ] Google Picker API統合（チャンネル追加UX改善）
 
-### よくある問題
-1. **OAuth認証エラー**
-   - Client IDの設定確認
-   - スコープの一致確認
-   - リダイレクトURIの設定
+#### バックグラウンド再生完全統合（Phase 3-4b）
+- [ ] VideoPlayerScreenの書き換え
+- [ ] バックグラウンド/フォアグラウンド切り替え
+- [ ] ロック画面コントロール
 
-2. **動画再生エラー**
-   - アクセストークンの有効性
-   - ファイルIDの正確性
-   - ネットワーク接続
+#### 追加最適化
+- [ ] Firestoreクエリの最適化（リアルタイムリスナー）
+- [ ] スケルトンローディングの導入
+- [ ] Pull-to-refresh機能
 
-3. **Firestore権限エラー**
-   - Security Rulesの確認
-   - 認証状態の確認
+#### 設定画面の拡張
+- [ ] キャッシュクリア機能
+- [ ] デフォルト再生速度の設定
+- [ ] ダークモード切り替え
 
-## 📚 参考資料
+---
 
-### 公式ドキュメント
-- [Flutter公式](https://flutter.dev/docs)
-- [Firebase for Flutter](https://firebase.google.com/docs/flutter/setup)
-- [Google Drive API v3](https://developers.google.com/drive/api/v3/about-sdk)
-- [Material Design 3](https://m3.material.io/)
+## 📚 重要なドキュメント
 
-### プロジェクト固有ドキュメント
-- `/要件概要` - 初期要件定義
-- `/外部設計書_DriveVideoPlayer.md` - 詳細設計仕様
+### セットアップ
+- `docs/setup/firebase-google-cloud-setup.md` - Firebase & Google Cloud設定
+- `docs/setup/local-setup-instructions.md` - ローカル開発環境設定
 
-### 重要な意思決定の経緯
-プロジェクト名選定プロセス:
-1. DriveCast → 既存サービスと衝突
-2. VodCast → 既存サービスと衝突
-3. PlayDrive → 既存サービスと衝突
-4. **Feedivo** ✅ → コインドターム、衝突リスク最小
+### 実装履歴
+- `docs/archive/implementation-history.md` - Phase 1-4の詳細実装履歴
+- `docs/archive/phase4-completion-summary.md` - Phase 4完了サマリー
+- `docs/archive/phase3-4-background-playback.md` - バックグラウンド再生実装状況
+
+### デザイン
+- `docs/visual_design.md` - ビジュアルデザインガイド
+
+### テスト
+- `docs/test_channel_setup.md` - テスト用チャンネルセットアップ
+
+---
 
 ## 💡 AI支援時の注意事項
 
@@ -331,13 +251,60 @@ match /users/{userId} {
 1. **プロジェクトコンテキストの理解**: このドキュメントを参照して一貫性のある提案を行う
 2. **技術的な妥当性**: 最新のFlutter/Firebase/Google APIのベストプラクティスに基づく
 3. **セキュリティ意識**: 常にセキュリティとプライバシーを考慮
-4. **ユーザー体験優先**: 技術的な実現可能性とUXのバランス
+4. **Clean Architecture準拠**: 層分離を厳守
+5. **コード品質**: lint 0エラーを維持
 
 ### 回答時のガイドライン
 - 不明点は推測せず「わかりません」と回答
-- 使用したソースやURLを明示
-- 外部設計書との整合性を保つ
+- Clean Architectureの層分離を維持
+- 既存のコーディングスタイルに従う
+- パフォーマンスとユーザー体験を考慮
 - バージョン情報を含める（古い情報を避ける）
+
+### よく使用するパターン
+
+#### Provider統合
+```dart
+ChangeNotifierProvider(
+  create: (context) => SomeProvider(
+    context.read<ISomeRepository>(),
+  ),
+)
+```
+
+#### エラー表示
+```dart
+ErrorDisplay(
+  message: 'エラーメッセージ',
+  onRetry: () => _loadData(),
+)
+```
+
+#### 画像表示
+```dart
+CachedNetworkImage(
+  imageUrl: 'https://www.googleapis.com/drive/v3/files/$fileId?alt=media',
+  memCacheWidth: width.toInt() * 2,
+  memCacheHeight: height.toInt() * 2,
+)
+```
+
+---
+
+## 🚀 現在の状態
+
+**Feedivoアプリは現在、プロダクション環境へのデプロイ準備が整った状態です。**
+
+すべてのコア機能と拡張機能が実装され、パフォーマンスが最適化され、コード品質が確保されています。
+
+### 次のステップ
+
+1. **追加機能の実装**（Phase 5）
+2. **テスト自動化**（単体テスト、統合テスト）
+3. **デプロイ準備**（App Store / Play Store申請）
+4. **ユーザーフィードバック**（ベータテスト）
+
+---
 
 ## 🔄 このドキュメントの更新
 
@@ -346,24 +313,4 @@ match /users/{userId} {
 - 重要な技術的決定を行った時
 - 新しい制約や課題が見つかった時
 - アーキテクチャに変更があった時
-- フェーズが進行した時
-
----
-
-## 📝 更新履歴
-
-### 2025-12-31: Phase 2-1完了
-- ✅ Phase 2-1（Google Drive API基盤とドメインモデル）を完了
-- Domain層: エンティティ4つ、リポジトリインターフェース4つを作成
-- Core層: カスタム例外定義（8種類のエラー型）
-- Data層: GoogleDriveService、モデルクラス4つを実装
-- JSONベースのチャンネル設定ファイルスキーマを設計
-- pedantic_mono準拠（Lint & Format）
-
-### 2025-12-31: Phase 1完了
-- ✅ Phase 1（基盤構築）を完了としてマーク
-- パッケージバージョンを実際の採用版に更新
-  - `google_sign_in: ^6.2.2` (7.x系は破壊的変更のため見送り)
-  - Firebase関連パッケージを最新版に更新
-- 実装ガイドラインにLint & Format規則を追加
-- 完了事項の詳細を記録
+- 新しいPhaseが開始された時
