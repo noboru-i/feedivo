@@ -22,16 +22,18 @@ class GoogleDriveService {
   /// トークンが期限切れの場合は自動更新を試みる
   Future<String> getAccessToken() async {
     try {
-      final account = await _googleSignIn.signInSilently();
-      if (account == null) {
-        throw UnauthorizedException('ログインしていません');
-      }
+      // google_sign_in 7.x: authorizationClientを使用してaccessTokenを取得
+      final authClient = _googleSignIn.authorizationClient;
 
-      final auth = await account.authentication;
-      final accessToken = auth.accessToken;
+      // Google Driveのscopesに対する認可を取得
+      final authorization = await authClient.authorizationForScopes([
+        'https://www.googleapis.com/auth/drive.readonly',
+      ]);
+
+      final accessToken = authorization?.accessToken;
 
       if (accessToken == null || accessToken.isEmpty) {
-        throw TokenExpiredException();
+        throw UnauthorizedException('ログインしていないか、権限が不足しています');
       }
 
       return accessToken;

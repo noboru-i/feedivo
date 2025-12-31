@@ -14,13 +14,10 @@ class AuthRepository implements IAuthRepository {
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
-  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-       _googleSignIn =
-           googleSignIn ??
-           GoogleSignIn(
-             scopes: AppConstants.googleScopes,
-           ),
-       _firestore = firestore ?? FirebaseFirestore.instance;
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance;
+
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
@@ -39,19 +36,23 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<User?> signInWithGoogle() async {
     try {
-      // Google Sign-in フロー
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        // ユーザーがサインインをキャンセル
-        return null;
-      }
+      // Google Sign-in フロー (v7.x)
+      final googleUser = await _googleSignIn.authenticate(
+        scopeHint: AppConstants.googleScopes,
+      );
 
-      // Google認証情報を取得
-      final googleAuth = await googleUser.authentication;
+      // scopeの認可を取得してaccessTokenを取得
+      final authClient = googleUser.authorizationClient;
+      final authorization = await authClient.authorizationForScopes(
+        AppConstants.googleScopes,
+      );
+
+      // Google認証情報を取得 (v7.xでは同期的)
+      final googleAuth = googleUser.authentication;
 
       // Firebase認証クレデンシャルを作成
       final credential = firebase_auth.GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: authorization?.accessToken,
         idToken: googleAuth.idToken,
       );
 

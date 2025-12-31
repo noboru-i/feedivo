@@ -51,6 +51,9 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
+  // Google Sign-Inの初期化 (v7.x)
+  await GoogleSignIn.instance.initialize();
+
   runApp(const MyApp());
 }
 
@@ -72,7 +75,7 @@ class MyApp extends StatelessWidget {
         Provider<IGoogleDriveRepository>(
           create: (_) => GoogleDriveRepository(
             driveService: GoogleDriveService(
-              googleSignIn: GoogleSignIn(scopes: AppConstants.googleScopes),
+              googleSignIn: GoogleSignIn.instance,
               httpClient: http.Client(),
             ),
           ),
