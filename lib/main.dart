@@ -10,12 +10,15 @@ import 'config/theme/app_theme.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/channel_repository.dart';
 import 'data/repositories/google_drive_repository.dart';
+import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
 import 'domain/repositories/channel_repository_interface.dart';
 import 'domain/repositories/google_drive_repository_interface.dart';
+import 'domain/repositories/video_repository_interface.dart';
 import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/channel_provider.dart';
+import 'presentation/providers/video_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/channel/add_channel_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
@@ -63,11 +66,21 @@ class MyApp extends StatelessWidget {
             driveRepo: context.read<IGoogleDriveRepository>(),
           ),
         ),
+        Provider<IVideoRepository>(
+          create: (_) => VideoRepository(
+            firestore: FirebaseFirestore.instance,
+          ),
+        ),
 
         // Phase 2: Providers
         ChangeNotifierProvider(
           create: (context) => ChannelProvider(
             context.read<IChannelRepository>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => VideoProvider(
+            context.read<IVideoRepository>(),
           ),
         ),
       ],

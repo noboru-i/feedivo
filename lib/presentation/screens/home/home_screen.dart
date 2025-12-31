@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
 import '../../widgets/empty_state_widget.dart';
+import '../channel/channel_detail_screen.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
@@ -128,9 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
               return ChannelCard(
                 channel: channel,
                 onTap: () {
-                  // TODO: Phase 2-3でチャンネル詳細画面に遷移
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('チャンネル詳細は準備中です')),
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => ChannelDetailScreen(
+                        channel: channel,
+                      ),
+                    ),
                   );
                 },
               );
