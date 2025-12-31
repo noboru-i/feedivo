@@ -11,8 +11,8 @@ class GoogleDriveService {
   GoogleDriveService({
     required GoogleSignIn googleSignIn,
     http.Client? httpClient,
-  })  : _googleSignIn = googleSignIn,
-        _httpClient = httpClient ?? http.Client();
+  }) : _googleSignIn = googleSignIn,
+       _httpClient = httpClient ?? http.Client();
   final GoogleSignIn _googleSignIn;
   final http.Client _httpClient;
 

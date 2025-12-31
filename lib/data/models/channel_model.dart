@@ -18,20 +18,9 @@ class ChannelModel {
     this.lastFetchedAt,
   });
 
-  final String id;
-  final String userId;
-  final String name;
-  final String description;
-  final String? thumbnailFileId;
-  final String configFileId;
-  final DateTime? configLastUpdated;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? lastFetchedAt;
-
   /// FirestoreのDocumentSnapshotからモデルを生成
   factory ChannelModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data()! as Map<String, dynamic>;
 
     return ChannelModel(
       id: doc.id,
@@ -44,40 +33,6 @@ class ChannelModel {
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       lastFetchedAt: (data['lastFetchedAt'] as Timestamp?)?.toDate(),
-    );
-  }
-
-  /// Firestoreに保存する形式に変換
-  Map<String, dynamic> toFirestore() {
-    return {
-      'userId': userId,
-      'name': name,
-      'description': description,
-      'thumbnailFileId': thumbnailFileId,
-      'configFileId': configFileId,
-      'configLastUpdated': configLastUpdated != null
-          ? Timestamp.fromDate(configLastUpdated!)
-          : null,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'lastFetchedAt':
-          lastFetchedAt != null ? Timestamp.fromDate(lastFetchedAt!) : null,
-    };
-  }
-
-  /// Domain Entityに変換
-  Channel toEntity() {
-    return Channel(
-      id: id,
-      userId: userId,
-      name: name,
-      description: description,
-      thumbnailFileId: thumbnailFileId,
-      configFileId: configFileId,
-      configLastUpdated: configLastUpdated,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      lastFetchedAt: lastFetchedAt,
     );
   }
 
@@ -94,6 +49,52 @@ class ChannelModel {
       createdAt: channel.createdAt,
       updatedAt: channel.updatedAt,
       lastFetchedAt: channel.lastFetchedAt,
+    );
+  }
+
+  final String id;
+  final String userId;
+  final String name;
+  final String description;
+  final String? thumbnailFileId;
+  final String configFileId;
+  final DateTime? configLastUpdated;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? lastFetchedAt;
+
+  /// Firestoreに保存する形式に変換
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'name': name,
+      'description': description,
+      'thumbnailFileId': thumbnailFileId,
+      'configFileId': configFileId,
+      'configLastUpdated': configLastUpdated != null
+          ? Timestamp.fromDate(configLastUpdated!)
+          : null,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+      'lastFetchedAt': lastFetchedAt != null
+          ? Timestamp.fromDate(lastFetchedAt!)
+          : null,
+    };
+  }
+
+  /// Domain Entityに変換
+  Channel toEntity() {
+    return Channel(
+      id: id,
+      userId: userId,
+      name: name,
+      description: description,
+      thumbnailFileId: thumbnailFileId,
+      configFileId: configFileId,
+      configLastUpdated: configLastUpdated,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      lastFetchedAt: lastFetchedAt,
     );
   }
 }

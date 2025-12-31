@@ -24,9 +24,7 @@ class ChannelConfig {
 
   @override
   int get hashCode {
-    return version.hashCode ^
-        channelInfo.hashCode ^
-        _listHashCode(videos);
+    return version.hashCode ^ channelInfo.hashCode ^ _listHashCode(videos);
   }
 
   @override

@@ -1,5 +1,6 @@
 /// カスタム例外の定義
 /// アプリケーション全体で使用するエラー型
+library;
 
 /// ネットワーク接続エラー
 class NetworkException implements Exception {

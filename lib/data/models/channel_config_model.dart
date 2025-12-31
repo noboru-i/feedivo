@@ -10,10 +10,6 @@ class ChannelConfigModel {
     required this.videos,
   });
 
-  final String version;
-  final ChannelInfoModel channelInfo;
-  final List<VideoInfoModel> videos;
-
   /// JSONからモデルを生成（バリデーション含む）
   factory ChannelConfigModel.fromJson(Map<String, dynamic> json) {
     // バージョンチェック
@@ -51,6 +47,10 @@ class ChannelConfigModel {
     }
   }
 
+  final String version;
+  final ChannelInfoModel channelInfo;
+  final List<VideoInfoModel> videos;
+
   /// Domain Entityに変換
   ChannelConfig toEntity() {
     return ChannelConfig(
@@ -70,12 +70,6 @@ class ChannelInfoModel {
     this.thumbnailFileId,
     required this.updatedAt,
   });
-
-  final String id;
-  final String name;
-  final String description;
-  final String? thumbnailFileId;
-  final DateTime updatedAt;
 
   factory ChannelInfoModel.fromJson(Map<String, dynamic> json) {
     // 必須フィールドのバリデーション
@@ -114,6 +108,12 @@ class ChannelInfoModel {
     );
   }
 
+  final String id;
+  final String name;
+  final String description;
+  final String? thumbnailFileId;
+  final DateTime updatedAt;
+
   ChannelInfo toEntity() {
     return ChannelInfo(
       id: id,
@@ -136,14 +136,6 @@ class VideoInfoModel {
     required this.duration,
     required this.publishedAt,
   });
-
-  final String id;
-  final String title;
-  final String description;
-  final String videoFileId;
-  final String? thumbnailFileId;
-  final int duration;
-  final DateTime publishedAt;
 
   factory VideoInfoModel.fromJson(Map<String, dynamic> json) {
     // 必須フィールドのバリデーション
@@ -191,6 +183,14 @@ class VideoInfoModel {
       publishedAt: publishedAt,
     );
   }
+
+  final String id;
+  final String title;
+  final String description;
+  final String videoFileId;
+  final String? thumbnailFileId;
+  final int duration;
+  final DateTime publishedAt;
 
   VideoInfo toEntity() {
     return VideoInfo(

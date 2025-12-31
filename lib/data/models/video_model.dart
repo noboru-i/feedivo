@@ -16,18 +16,9 @@ class VideoModel {
     required this.publishedAt,
   });
 
-  final String id;
-  final String channelId;
-  final String title;
-  final String description;
-  final String videoFileId;
-  final String? thumbnailFileId;
-  final int duration;
-  final DateTime publishedAt;
-
   /// FirestoreのDocumentSnapshotからモデルを生成
   factory VideoModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data()! as Map<String, dynamic>;
 
     return VideoModel(
       id: doc.id,
@@ -40,6 +31,29 @@ class VideoModel {
       publishedAt: (data['publishedAt'] as Timestamp).toDate(),
     );
   }
+
+  /// Domain EntityからModelを生成
+  factory VideoModel.fromEntity(Video video) {
+    return VideoModel(
+      id: video.id,
+      channelId: video.channelId,
+      title: video.title,
+      description: video.description,
+      videoFileId: video.videoFileId,
+      thumbnailFileId: video.thumbnailFileId,
+      duration: video.duration,
+      publishedAt: video.publishedAt,
+    );
+  }
+
+  final String id;
+  final String channelId;
+  final String title;
+  final String description;
+  final String videoFileId;
+  final String? thumbnailFileId;
+  final int duration;
+  final DateTime publishedAt;
 
   /// Firestoreに保存する形式に変換
   Map<String, dynamic> toFirestore() {
@@ -65,20 +79,6 @@ class VideoModel {
       thumbnailFileId: thumbnailFileId,
       duration: duration,
       publishedAt: publishedAt,
-    );
-  }
-
-  /// Domain EntityからModelを生成
-  factory VideoModel.fromEntity(Video video) {
-    return VideoModel(
-      id: video.id,
-      channelId: video.channelId,
-      title: video.title,
-      description: video.description,
-      videoFileId: video.videoFileId,
-      thumbnailFileId: video.thumbnailFileId,
-      duration: video.duration,
-      publishedAt: video.publishedAt,
     );
   }
 }

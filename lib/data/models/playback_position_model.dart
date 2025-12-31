@@ -14,16 +14,9 @@ class PlaybackPositionModel {
     required this.isCompleted,
   });
 
-  final String videoId;
-  final String channelId;
-  final int position;
-  final int duration;
-  final DateTime lastPlayedAt;
-  final bool isCompleted;
-
   /// FirestoreのDocumentSnapshotからモデルを生成
   factory PlaybackPositionModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data()! as Map<String, dynamic>;
 
     return PlaybackPositionModel(
       videoId: doc.id,
@@ -34,6 +27,25 @@ class PlaybackPositionModel {
       isCompleted: data['isCompleted'] as bool,
     );
   }
+
+  /// Domain EntityからModelを生成
+  factory PlaybackPositionModel.fromEntity(PlaybackPosition position) {
+    return PlaybackPositionModel(
+      videoId: position.videoId,
+      channelId: position.channelId,
+      position: position.position,
+      duration: position.duration,
+      lastPlayedAt: position.lastPlayedAt,
+      isCompleted: position.isCompleted,
+    );
+  }
+
+  final String videoId;
+  final String channelId;
+  final int position;
+  final int duration;
+  final DateTime lastPlayedAt;
+  final bool isCompleted;
 
   /// Firestoreに保存する形式に変換
   Map<String, dynamic> toFirestore() {
@@ -56,18 +68,6 @@ class PlaybackPositionModel {
       duration: duration,
       lastPlayedAt: lastPlayedAt,
       isCompleted: isCompleted,
-    );
-  }
-
-  /// Domain EntityからModelを生成
-  factory PlaybackPositionModel.fromEntity(PlaybackPosition position) {
-    return PlaybackPositionModel(
-      videoId: position.videoId,
-      channelId: position.channelId,
-      position: position.position,
-      duration: position.duration,
-      lastPlayedAt: position.lastPlayedAt,
-      isCompleted: position.isCompleted,
     );
   }
 }
