@@ -92,26 +92,25 @@ users/{userId}/
 ### 主要パッケージ（バージョン管理）
 ```yaml
 # 認証・Drive API
-google_sign_in: ^6.1.0  # 最新7.xも調査済み
-googleapis: ^11.0.0
-googleapis_auth: ^1.4.0
+google_sign_in: ^6.2.2  # 6.x系を採用（7.x系は破壊的変更あり）
+googleapis: ^15.0.0
+googleapis_auth: ^2.0.0
 
 # Firebase
-firebase_core: ^2.24.0
-firebase_auth: ^4.15.0
-cloud_firestore: ^4.13.0
-firebase_analytics: ^10.7.0
+firebase_core: ^4.3.0
+firebase_auth: ^6.1.3
+cloud_firestore: ^6.1.1
+firebase_analytics: ^12.1.0
 
-# 動画再生
-video_player: ^2.8.0
-chewie: ^1.7.0
+# 動画再生（Phase 2で実装予定）
+# video_player: ^2.8.0
+# chewie: ^1.7.0
 
-# 状態管理（選択肢）
-provider: ^6.1.0
-# OR riverpod: ^2.4.0
+# 状態管理
+provider: ^6.1.5+1
 ```
 
-**注意**: パッケージバージョンは実装時に最新の安定版を確認すること
+**注意**: google_sign_in 7.x系は認証フローが大幅に変更されているため、Phase 1では安定した6.x系を採用
 
 ### Google Drive API統合
 
@@ -151,12 +150,22 @@ match /users/{userId} {
 
 ## 📊 開発フェーズと優先順位
 
-### Phase 1: 基盤構築（2-3週間）
+### Phase 1: 基盤構築（2-3週間）✅ **完了**
 **優先度**: 🔴 最高
-- [ ] Flutterプロジェクトセットアップ
-- [ ] Firebase初期設定（Auth, Firestore, Analytics）
-- [ ] Google OAuth認証実装
-- [ ] 基本的な画面レイアウト（モックアップに基づく）
+- [x] Flutterプロジェクトセットアップ
+- [x] Firebase初期設定（Auth, Firestore, Analytics）
+- [x] Google OAuth認証実装
+- [x] 基本的な画面レイアウト（モックアップに基づく）
+
+**完了事項**:
+- Clean Architecture構造の実装（Domain/Data/Presentation層）
+- Material Design 3テーマシステム
+- Firebase Authentication & Firestore セキュリティルール設定
+- Google Sign-in統合（google_sign_in 6.2.2）
+- 基本画面実装：Splash, Login, Home, Settings
+- Lint & Format対応（pedantic_mono準拠）
+- セキュリティ対応：秘匿情報の.gitignore化、テンプレートファイル作成
+- ドキュメント整備：Firebase/Google Cloudセットアップガイド
 
 ### Phase 2: コア機能（3-4週間）
 **優先度**: 🔴 最高
@@ -200,12 +209,21 @@ match /users/{userId} {
 
 2. **Null Safety**: Dartのnull安全性を最大限活用
 
-3. **エラーハンドリング**: 
+3. **エラーハンドリング**:
    - ユーザーフレンドリーなエラーメッセージ
    - 適切なログ記録（Firebase Crashlytics）
    - ネットワークエラーへの対応
+   - Catch句には具体的な例外型を指定（`on Exception catch`）
 
-4. **テスト**:
+4. **Lint & Format**:
+   - `pedantic_mono` の厳格なルールに準拠
+   - `dart format` で自動フォーマット
+   - 無効化ルール：
+     - `avoid_print`: 開発中は許可
+     - `flutter_style_todos`: 標準TODOフォーマット使用
+     - `lines_longer_than_80_chars`: 可読性優先
+
+5. **テスト**:
    - 単体テスト: ビジネスロジック
    - ウィジェットテスト: UI コンポーネント
    - 統合テスト: クリティカルフロー
@@ -314,3 +332,15 @@ match /users/{userId} {
 - 新しい制約や課題が見つかった時
 - アーキテクチャに変更があった時
 - フェーズが進行した時
+
+---
+
+## 📝 更新履歴
+
+### 2025-12-31: Phase 1完了
+- ✅ Phase 1（基盤構築）を完了としてマーク
+- パッケージバージョンを実際の採用版に更新
+  - `google_sign_in: ^6.2.2` (7.x系は破壊的変更のため見送り)
+  - Firebase関連パッケージを最新版に更新
+- 実装ガイドラインにLint & Format規則を追加
+- 完了事項の詳細を記録
