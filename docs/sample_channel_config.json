@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "channel": {
+    "id": "test-channel-001",
+    "name": "テストチャンネル",
+    "description": "Feedivo開発用のテストチャンネルです。Phase 2-2の動作確認用に作成しました。",
+    "thumbnail_file_id": null,
+    "updated_at": "2025-12-31T00:00:00Z"
+  },
+  "videos": []
+}
