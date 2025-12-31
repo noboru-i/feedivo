@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_typography.dart';
 import '../../../config/theme/app_dimensions.dart';
+import '../../../config/theme/app_typography.dart';
 import '../../providers/auth_provider.dart';
 
 /// スプラッシュ画面
@@ -24,17 +25,19 @@ class _SplashScreenState extends State<SplashScreen> {
   /// アプリ初期化と画面遷移
   Future<void> _initializeApp() async {
     // 最小表示時間（UX向上のため）
-    await Future.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(const Duration(seconds: 2));
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     // 認証状態に応じて遷移
     if (authProvider.isAuthenticated) {
-      Navigator.pushReplacementNamed(context, '/home');
+      await Navigator.pushReplacementNamed(context, '/home');
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
+      await Navigator.pushReplacementNamed(context, '/login');
     }
   }
 
@@ -51,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: const Center(
@@ -73,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 80),
 
             // ローディングインジケーター
-            SizedBox(
+            const SizedBox(
               width: AppDimensions.progressIndicatorSizeStandard,
               height: AppDimensions.progressIndicatorSizeStandard,
               child: CircularProgressIndicator(

@@ -4,10 +4,6 @@ import '../../domain/entities/user.dart';
 /// UserエンティティのData層モデル
 /// FirebaseのUserオブジェクトとDomain層のUserエンティティを相互変換
 class UserModel {
-  final String uid;
-  final String email;
-  final String displayName;
-  final String? photoUrl;
 
   UserModel({
     required this.uid,
@@ -36,6 +32,20 @@ class UserModel {
     );
   }
 
+  /// Domain層のUserエンティティからUserModelを作成
+  factory UserModel.fromEntity(User user) {
+    return UserModel(
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoUrl: user.photoUrl,
+    );
+  }
+  final String uid;
+  final String email;
+  final String displayName;
+  final String? photoUrl;
+
   /// Firestoreに保存するためのMapに変換
   Map<String, dynamic> toJson() {
     return {
@@ -53,16 +63,6 @@ class UserModel {
       email: email,
       displayName: displayName,
       photoUrl: photoUrl,
-    );
-  }
-
-  /// Domain層のUserエンティティからUserModelを作成
-  factory UserModel.fromEntity(User user) {
-    return UserModel(
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoUrl: user.photoUrl,
     );
   }
 }

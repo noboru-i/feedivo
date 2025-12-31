@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'app_colors.dart';
-import 'app_typography.dart';
 import 'app_dimensions.dart';
+import 'app_typography.dart';
 
 /// Feedivoアプリのテーマ定義
 /// Material Design 3準拠
@@ -16,17 +17,14 @@ class AppTheme {
       brightness: Brightness.light,
 
       // Color Scheme
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primaryColor,
-        onPrimary: AppColors.onPrimary,
         primaryContainer: AppColors.primaryLight,
         onPrimaryContainer: AppColors.onPrimary,
         secondary: AppColors.secondaryColor,
         onSecondary: AppColors.onPrimary,
-        surface: AppColors.surfaceColor,
         onSurface: AppColors.primaryText,
         error: AppColors.errorColor,
-        onError: AppColors.onPrimary,
       ),
 
       // Background
@@ -49,7 +47,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacingM,
           vertical: AppDimensions.cardMargin,
         ),
@@ -64,7 +62,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
-          minimumSize: Size(
+          minimumSize: const Size(
             AppDimensions.buttonHeightStandard * 2,
             AppDimensions.buttonHeightStandard,
           ),
@@ -76,11 +74,11 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryColor,
-          side: BorderSide(color: AppColors.primaryColor, width: 1),
+          side: const BorderSide(color: AppColors.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
-          minimumSize: Size(
+          minimumSize: const Size(
             AppDimensions.buttonHeightStandard * 2,
             AppDimensions.buttonHeightStandard,
           ),
@@ -121,25 +119,25 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
         fillColor: Colors.transparent,
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacingM,
           vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
-          borderSide: BorderSide(color: AppColors.borderColor, width: 1),
+          borderSide: const BorderSide(color: AppColors.borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
-          borderSide: BorderSide(color: AppColors.borderColor, width: 1),
+          borderSide: const BorderSide(color: AppColors.borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
-          borderSide: BorderSide(color: AppColors.errorColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
         ),
         hintStyle: AppTypography.body1.copyWith(color: AppColors.disabledText),
         labelStyle: AppTypography.body2.copyWith(color: AppColors.primaryText),
@@ -169,7 +167,7 @@ class AppTheme {
       ),
 
       // Progress Indicator Theme
-      progressIndicatorTheme: ProgressIndicatorThemeData(
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primaryColor,
       ),
 
@@ -184,7 +182,7 @@ class AppTheme {
       ),
 
       // Text Theme
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         displayLarge: AppTypography.h1,
         displayMedium: AppTypography.h2,
         displaySmall: AppTypography.h3,
@@ -206,7 +204,7 @@ class AppTheme {
       brightness: Brightness.dark,
 
       // Color Scheme
-      colorScheme: ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimaryColor,
         onPrimary: Colors.white,
         primaryContainer: AppColors.darkPrimaryLight,
@@ -240,7 +238,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacingM,
           vertical: AppDimensions.cardMargin,
         ),
@@ -255,7 +253,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
-          minimumSize: Size(
+          minimumSize: const Size(
             AppDimensions.buttonHeightStandard * 2,
             AppDimensions.buttonHeightStandard,
           ),
@@ -274,7 +272,7 @@ class AppTheme {
       ),
 
       // Text Theme
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         displayLarge: AppTypography.h1,
         displayMedium: AppTypography.h2,
         displaySmall: AppTypography.h3,

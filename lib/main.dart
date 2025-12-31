@@ -1,21 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 
-// Config
-import 'config/theme/app_theme.dart';
 import 'config/constants.dart';
-
-// Data
+import 'config/theme/app_theme.dart';
 import 'data/repositories/auth_repository.dart';
-
-// Presentation
+import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
-import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/settings/settings_screen.dart';
+import 'presentation/screens/splash/splash_screen.dart';
 
 void main() async {
   // Flutter binding初期化
@@ -51,7 +46,6 @@ class MyApp extends StatelessWidget {
         // テーマ設定
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
 
         // 初期ルート
         initialRoute: '/splash',

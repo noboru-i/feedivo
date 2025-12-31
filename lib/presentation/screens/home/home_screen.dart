@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_typography.dart';
 import '../../../config/theme/app_dimensions.dart';
+import '../../../config/theme/app_typography.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
@@ -78,7 +79,6 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      currentIndex: 0,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),

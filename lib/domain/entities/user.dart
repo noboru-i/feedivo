@@ -1,10 +1,6 @@
 /// ユーザーエンティティ
 /// ドメイン層のビジネスロジックで使用する純粋なDartオブジェクト
 class User {
-  final String uid;
-  final String email;
-  final String displayName;
-  final String? photoUrl;
 
   User({
     required this.uid,
@@ -12,6 +8,10 @@ class User {
     required this.displayName,
     this.photoUrl,
   });
+  final String uid;
+  final String email;
+  final String displayName;
+  final String? photoUrl;
 
   @override
   bool operator ==(Object other) {

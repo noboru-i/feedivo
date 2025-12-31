@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_typography.dart';
-import '../../../config/theme/app_dimensions.dart';
+
 import '../../../config/constants.dart';
+import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_dimensions.dart';
+import '../../../config/theme/app_typography.dart';
 import '../../providers/auth_provider.dart';
 
 /// ログイン画面
@@ -14,7 +15,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -72,7 +73,7 @@ class LoginScreen extends StatelessWidget {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: const Center(
@@ -90,7 +91,7 @@ class LoginScreen extends StatelessWidget {
       child: Text(
         AppConstants.appDescription,
         style: AppTypography.body1.copyWith(
-          color: AppColors.onPrimary.withOpacity(0.8),
+          color: AppColors.onPrimary.withValues(alpha: 0.8),
         ),
         textAlign: TextAlign.center,
       ),
@@ -106,7 +107,7 @@ class LoginScreen extends StatelessWidget {
               : () async {
                   final success = await authProvider.signInWithGoogle();
                   if (success && context.mounted) {
-                    Navigator.pushReplacementNamed(context, '/home');
+                    await Navigator.pushReplacementNamed(context, '/home');
                   } else if (authProvider.errorMessage != null &&
                       context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -132,11 +133,11 @@ class LoginScreen extends StatelessWidget {
                   height: AppDimensions.progressIndicatorSizeSmall,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Row(
+              : const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔐', style: TextStyle(fontSize: 20)),
-                    const SizedBox(width: 12),
+                    Text('🔐', style: TextStyle(fontSize: 20)),
+                    SizedBox(width: 12),
                     Text(
                       'Googleでログイン',
                       style: AppTypography.button,
@@ -152,7 +153,7 @@ class LoginScreen extends StatelessWidget {
     return Text(
       '利用規約 ・ プライバシーポリシー',
       style: AppTypography.caption.copyWith(
-        color: AppColors.onPrimary.withOpacity(0.6),
+        color: AppColors.onPrimary.withValues(alpha: 0.6),
       ),
     );
   }

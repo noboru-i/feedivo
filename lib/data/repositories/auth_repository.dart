@@ -1,18 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../config/constants.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository_interface.dart';
 import '../models/user_model.dart';
-import '../../config/constants.dart';
 
 /// 認証リポジトリの実装
 /// Firebase AuthenticationとGoogle Sign-Inを使用
 class AuthRepository implements IAuthRepository {
-  final firebase_auth.FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
-  final FirebaseFirestore _firestore;
 
   AuthRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
@@ -24,6 +21,9 @@ class AuthRepository implements IAuthRepository {
               scopes: AppConstants.googleScopes,
             ),
         _firestore = firestore ?? FirebaseFirestore.instance;
+  final firebase_auth.FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore _firestore;
 
   @override
   Future<User?> getCurrentUser() async {
@@ -38,14 +38,14 @@ class AuthRepository implements IAuthRepository {
   Future<User?> signInWithGoogle() async {
     try {
       // Google Sign-in フロー
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         // ユーザーがサインインをキャンセル
         return null;
       }
 
       // Google認証情報を取得
-      final GoogleSignInAuthentication googleAuth =
+      final googleAuth =
           await googleUser.authentication;
 
       // Firebase認証クレデンシャルを作成
@@ -55,7 +55,7 @@ class AuthRepository implements IAuthRepository {
       );
 
       // Firebaseにサインイン
-      final firebase_auth.UserCredential userCredential =
+      final userCredential =
           await _firebaseAuth.signInWithCredential(credential);
 
       final firebaseUser = userCredential.user;

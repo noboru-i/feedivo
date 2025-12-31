@@ -57,5 +57,5 @@ class AppColors {
   static const Color borderLightColor = Color(0xFFE2E8F0);
 
   // Overlay Color
-  static Color overlayColor = Colors.black.withOpacity(0.6);
+  static Color overlayColor = Colors.black.withValues(alpha: 0.6);
 }

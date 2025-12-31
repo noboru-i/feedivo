@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_typography.dart';
-import '../../../config/theme/app_dimensions.dart';
+
 import '../../../config/constants.dart';
+import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_dimensions.dart';
+import '../../../config/theme/app_typography.dart';
 import '../../providers/auth_provider.dart';
 
 /// 設定画面
@@ -28,7 +29,6 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.info,
             title: 'バージョン',
             subtitle: AppConstants.appVersion,
-            onTap: null,
           ),
           _buildListItem(
             icon: Icons.description,
@@ -93,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
             if (confirmed && context.mounted) {
               await authProvider.signOut();
               if (context.mounted) {
-                Navigator.pushNamedAndRemoveUntil(
+                await Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
                   (route) => false,

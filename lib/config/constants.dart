@@ -25,7 +25,7 @@ class AppConstants {
   static const String keyDefaultPlaybackSpeed = 'default_playback_speed';
 
   // デフォルト値
-  static const double defaultPlaybackSpeed = 1.0;
+  static const double defaultPlaybackSpeed = 1;
   static const bool defaultAutoPlay = true;
   static const bool defaultBackgroundPlay = true;
 }
