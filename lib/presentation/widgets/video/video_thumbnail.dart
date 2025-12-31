@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -29,31 +30,23 @@ class VideoThumbnail extends StatelessWidget {
       child: thumbnailFileId != null
           ? ClipRRect(
               borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-              child: Image.network(
-                'https://www.googleapis.com/drive/v3/files/$thumbnailFileId?alt=media',
+              child: CachedNetworkImage(
+                imageUrl:
+                    'https://www.googleapis.com/drive/v3/files/$thumbnailFileId?alt=media',
                 width: width,
                 height: height,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
-                      strokeWidth: 2,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryColor,
-                      ),
+                memCacheWidth: width.toInt() * 2, // 2x resolution for retina
+                memCacheHeight: height.toInt() * 2,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryColor,
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildPlaceholder();
-                },
+                  ),
+                ),
+                errorWidget: (context, url, error) => _buildPlaceholder(),
               ),
             )
           : _buildPlaceholder(),
