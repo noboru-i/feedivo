@@ -8,6 +8,7 @@ import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../channel/channel_detail_screen.dart';
+import '../history/history_screen.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
@@ -19,6 +20,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -147,13 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
+      currentIndex: _selectedIndex,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'ホーム',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
+          icon: Icon(Icons.history),
           label: '履歴',
         ),
         BottomNavigationBarItem(
@@ -162,10 +166,37 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
       onTap: (index) {
-        if (index == 2) {
-          Navigator.pushNamed(context, '/settings');
+        setState(() {
+          _selectedIndex = index;
+        });
+
+        switch (index) {
+          case 0:
+            // ホーム - 何もしない（既にホーム画面）
+            break;
+          case 1:
+            // 履歴画面へ遷移
+            Navigator.of(context)
+                .push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const HistoryScreen(),
+                  ),
+                )
+                .then((_) {
+                  // 履歴画面から戻ったときにホームをハイライト
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                });
+          case 2:
+            // 設定画面へ遷移
+            Navigator.pushNamed(context, '/settings').then((_) {
+              // 設定画面から戻ったときにホームをハイライト
+              setState(() {
+                _selectedIndex = 0;
+              });
+            });
         }
-        // TODO: Phase 2で各画面への遷移を実装
       },
     );
   }
