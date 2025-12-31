@@ -11,22 +11,22 @@ class GoogleDriveRepository implements IGoogleDriveRepository {
   final GoogleDriveService _driveService;
 
   @override
-  Future<String> getAccessToken() async {
+  Future<String> getAccessToken() {
     return _driveService.getAccessToken();
   }
 
   @override
-  Future<String> downloadFileAsString(String fileId) async {
+  Future<String> downloadFileAsString(String fileId) {
     return _driveService.downloadFileAsString(fileId);
   }
 
   @override
-  Future<List<int>> downloadFileAsBytes(String fileId) async {
+  Future<List<int>> downloadFileAsBytes(String fileId) {
     return _driveService.downloadFileAsBytes(fileId);
   }
 
   @override
-  Future<Map<String, dynamic>> getFileMetadata(String fileId) async {
+  Future<Map<String, dynamic>> getFileMetadata(String fileId) {
     return _driveService.getFileMetadata(fileId);
   }
 

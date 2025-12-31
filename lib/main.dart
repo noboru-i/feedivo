@@ -1,13 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import 'config/constants.dart';
 import 'config/theme/app_theme.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/channel_repository.dart';
+import 'data/repositories/google_drive_repository.dart';
+import 'data/services/google_drive_service.dart';
+import 'domain/repositories/channel_repository_interface.dart';
+import 'domain/repositories/google_drive_repository_interface.dart';
 import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
+import 'presentation/providers/channel_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/screens/channel/add_channel_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/settings/settings_screen.dart';
 import 'presentation/screens/splash/splash_screen.dart';
@@ -31,13 +41,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // AuthProvider
+        // Phase 1: AuthProvider
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
             AuthRepository(),
           ),
         ),
-        // TODO: Phase 2で他のProviderを追加
+
+        // Phase 2: Repositories
+        Provider<IGoogleDriveRepository>(
+          create: (_) => GoogleDriveRepository(
+            driveService: GoogleDriveService(
+              googleSignIn: GoogleSignIn(scopes: AppConstants.googleScopes),
+              httpClient: http.Client(),
+            ),
+          ),
+        ),
+        Provider<IChannelRepository>(
+          create: (context) => ChannelRepository(
+            firestore: FirebaseFirestore.instance,
+            driveRepo: context.read<IGoogleDriveRepository>(),
+          ),
+        ),
+
+        // Phase 2: Providers
+        ChangeNotifierProvider(
+          create: (context) => ChannelProvider(
+            context.read<IChannelRepository>(),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: AppConstants.appName,
@@ -56,6 +88,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/home': (context) => const HomeScreen(),
           '/settings': (context) => const SettingsScreen(),
+          '/add-channel': (context) => const AddChannelScreen(),
         },
 
         // 未定義ルートのハンドリング

@@ -72,8 +72,10 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
       _isAdding = true;
     });
 
-    final success =
-        await channelProvider.addChannel(userId, _fileIdController.text.trim());
+    final success = await channelProvider.addChannel(
+      userId,
+      _fileIdController.text.trim(),
+    );
 
     setState(() {
       _isAdding = false;
@@ -92,8 +94,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
       // エラーメッセージはChannelProviderのerrorMessageに設定されている
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(channelProvider.errorMessage ?? 'チャンネルの追加に失敗しました'),
+          content: Text(channelProvider.errorMessage ?? 'チャンネルの追加に失敗しました'),
           backgroundColor: AppColors.errorColor,
         ),
       );
@@ -120,8 +121,8 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
               // 説明テキスト
               Text(
                 'Google Driveの設定ファイルIDまたは\n共有URLを入力してください',
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
+                style: AppTypography.body1.copyWith(
+                  color: AppColors.secondaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -158,8 +159,8 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
               // ヘルプテキスト
               Text(
                 'Google Driveの共有リンクまたはFile IDを貼り付けてください',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textDisabled,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.disabledText,
                 ),
               ),
 
@@ -185,8 +186,9 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text(
@@ -218,7 +220,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                           const SizedBox(width: AppDimensions.spacingS),
                           Text(
                             'ヒント',
-                            style: AppTypography.titleSmall.copyWith(
+                            style: AppTypography.h3.copyWith(
                               color: AppColors.infoColor,
                             ),
                           ),
@@ -227,8 +229,8 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                       const SizedBox(height: AppDimensions.spacingS),
                       Text(
                         '設定ファイルはJSON形式で作成し、Google Driveで共有設定を行ってください。詳しい手順はドキュメントを参照してください。',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.secondaryText,
                         ),
                       ),
                     ],

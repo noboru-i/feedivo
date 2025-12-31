@@ -15,8 +15,8 @@ class ChannelRepository implements IChannelRepository {
   ChannelRepository({
     required FirebaseFirestore firestore,
     required IGoogleDriveRepository driveRepo,
-  })  : _firestore = firestore,
-        _driveRepo = driveRepo;
+  }) : _firestore = firestore,
+       _driveRepo = driveRepo;
 
   final FirebaseFirestore _firestore;
   final IGoogleDriveRepository _driveRepo;
@@ -127,17 +127,18 @@ class ChannelRepository implements IChannelRepository {
       final channelModel = ChannelModel.fromFirestore(channelDoc);
 
       // Google Driveから最新の設定ファイルを取得
-      final configJson =
-          await _driveRepo.downloadFileAsString(channelModel.configFileId);
+      final configJson = await _driveRepo.downloadFileAsString(
+        channelModel.configFileId,
+      );
 
       // JSONをパース
       final configData = json.decode(configJson) as Map<String, dynamic>;
       final config = ChannelConfigModel.fromJson(configData);
 
       // 更新日時をチェック
-      final hasUpdate = channelModel.configLastUpdated == null ||
-          config.channelInfo.updatedAt
-              .isAfter(channelModel.configLastUpdated!);
+      final hasUpdate =
+          channelModel.configLastUpdated == null ||
+          config.channelInfo.updatedAt.isAfter(channelModel.configLastUpdated!);
 
       if (!hasUpdate) {
         // 更新がない場合はlastFetchedAtだけ更新

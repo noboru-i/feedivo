@@ -43,8 +43,7 @@ class ChannelProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final channel =
-          await _channelRepository.addChannel(userId, configFileId);
+      final channel = await _channelRepository.addChannel(userId, configFileId);
       _channels.insert(0, channel); // 先頭に追加
       _isLoading = false;
       notifyListeners();

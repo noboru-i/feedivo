@@ -82,7 +82,7 @@ class ChannelCard extends StatelessWidget {
                   // チャンネル名
                   Text(
                     channel.name,
-                    style: AppTypography.headlineSmall,
+                    style: AppTypography.h3,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -92,8 +92,8 @@ class ChannelCard extends StatelessWidget {
                   // 説明文
                   Text(
                     channel.description,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                    style: AppTypography.body2.copyWith(
+                      color: AppColors.secondaryText,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
