@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../domain/entities/video.dart';
+import '../../providers/playback_provider.dart';
 import 'duration_badge.dart';
 import 'video_thumbnail.dart';
 
@@ -21,6 +23,11 @@ class VideoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final playbackProvider = context.watch<PlaybackProvider>();
+    final playbackPosition = playbackProvider.getPosition(video.id);
+    final watchPercentage = playbackPosition?.watchPercentage ?? 0.0;
+    final isCompleted = playbackPosition?.isCompleted ?? false;
+
     return Card(
       margin: const EdgeInsets.only(
         left: AppDimensions.spacingM,
@@ -47,6 +54,61 @@ class VideoListItem extends StatelessWidget {
                     width: 160,
                     height: 90,
                   ),
+
+                  // 視聴進捗バー
+                  if (watchPercentage > 0 && !isCompleted)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: LinearProgressIndicator(
+                        value: watchPercentage,
+                        backgroundColor: Colors.black.withValues(alpha: 0.3),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryColor,
+                        ),
+                        minHeight: 3,
+                      ),
+                    ),
+
+                  // 視聴済みマーク
+                  if (isCompleted)
+                    Positioned(
+                      top: AppDimensions.spacingXS,
+                      left: AppDimensions.spacingXS,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.spacingXS,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.successColor,
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusXS,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.check,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              '視聴済み',
+                              style: AppTypography.caption.copyWith(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                   // 再生時間バッジ
                   Positioned(
                     bottom: AppDimensions.spacingXS,

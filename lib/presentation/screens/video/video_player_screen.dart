@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,8 +7,11 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../config/theme/app_colors.dart';
+import '../../../domain/entities/playback_position.dart';
 import '../../../domain/entities/video.dart';
 import '../../../domain/repositories/google_drive_repository_interface.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/playback_provider.dart';
 import '../../widgets/video/playback_speed_selector.dart';
 
 /// 動画再生画面
@@ -29,6 +34,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   double _playbackSpeed = 1;
+  Timer? _saveTimer;
+  int _lastSavedPosition = 0;
 
   @override
   void initState() {
@@ -111,6 +118,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       setState(() {
         _isLoading = false;
       });
+
+      // 視聴位置を復元
+      await _restorePlaybackPosition();
+
+      // 定期保存タイマーを開始（5秒ごと）
+      _startSaveTimer();
     } on Exception catch (e) {
       setState(() {
         _isLoading = false;
@@ -119,8 +132,86 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
+  /// 視聴位置を復元
+  Future<void> _restorePlaybackPosition() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final playbackProvider = context.read<PlaybackProvider>();
+      final userId = authProvider.currentUser?.uid;
+
+      if (userId == null) {
+        return;
+      }
+
+      await playbackProvider.loadPosition(userId, widget.video.id);
+      final position = playbackProvider.getPosition(widget.video.id);
+
+      if (position != null && position.position > 0 && !position.isCompleted) {
+        await _videoController?.seekTo(Duration(seconds: position.position));
+      }
+    } on Exception {
+      // エラーは無視（視聴位置がないだけの可能性）
+    }
+  }
+
+  /// 定期保存タイマーを開始
+  void _startSaveTimer() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _savePlaybackPosition();
+    });
+  }
+
+  /// 視聴位置を保存
+  Future<void> _savePlaybackPosition() async {
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return;
+    }
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final playbackProvider = context.read<PlaybackProvider>();
+      final userId = authProvider.currentUser?.uid;
+
+      if (userId == null) {
+        return;
+      }
+
+      final position = _videoController!.value.position.inSeconds;
+      final duration = _videoController!.value.duration.inSeconds;
+
+      // 位置が変わっていない場合はスキップ
+      if (position == _lastSavedPosition) {
+        return;
+      }
+
+      _lastSavedPosition = position;
+
+      final playbackPosition = PlaybackPosition(
+        videoId: widget.video.id,
+        channelId: widget.video.channelId,
+        position: position,
+        duration: duration,
+        lastPlayedAt: DateTime.now(),
+        isCompleted: false,
+      );
+
+      await playbackProvider.savePosition(userId, playbackPosition);
+
+      // 90%以上再生で視聴完了マーク
+      if (duration > 0 && position / duration >= 0.9) {
+        await playbackProvider.markCompleted(userId, widget.video.id);
+      }
+    } on Exception {
+      // エラーは無視（保存失敗してもプレイヤーは続行）
+    }
+  }
+
   @override
   void dispose() {
+    _saveTimer?.cancel();
+    // 最後に視聴位置を保存
+    _savePlaybackPosition();
     _videoController?.dispose();
     _chewieController?.dispose();
     super.dispose();
