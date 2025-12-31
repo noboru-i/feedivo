@@ -9,6 +9,7 @@ import '../../providers/channel_provider.dart';
 import '../../providers/video_provider.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/video/video_list_item.dart';
+import '../video/video_player_screen.dart';
 
 /// チャンネル詳細画面
 /// チャンネル情報と動画リストを表示
@@ -128,10 +129,11 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         return VideoListItem(
                           video: video,
                           onTap: () {
-                            // TODO: Phase 2-4で動画再生画面に遷移
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('動画再生機能は準備中です'),
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (context) => VideoPlayerScreen(
+                                  video: video,
+                                ),
                               ),
                             );
                           },
