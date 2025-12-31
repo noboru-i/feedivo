@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../domain/entities/video.dart';
 import '../../domain/repositories/video_repository_interface.dart';
@@ -9,31 +10,28 @@ import '../models/video_model.dart';
 class VideoRepository implements IVideoRepository {
   VideoRepository({
     required FirebaseFirestore firestore,
-  }) : _firestore = firestore;
+    required firebase_auth.FirebaseAuth firebaseAuth,
+  })  : _firestore = firestore,
+        _firebaseAuth = firebaseAuth;
 
   final FirebaseFirestore _firestore;
+  final firebase_auth.FirebaseAuth _firebaseAuth;
+
+  /// 現在のユーザーIDを取得
+  String get _currentUserId {
+    final userId = _firebaseAuth.currentUser?.uid;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+    return userId;
+  }
 
   @override
   Future<List<Video>> getVideos(String channelId) async {
     try {
-      // まずチャンネルドキュメントからuserIdを取得
-      final channelQuerySnapshot = await _firestore
-          .collectionGroup('channels')
-          .where('id', isEqualTo: channelId)
-          .limit(1)
-          .get();
-
-      if (channelQuerySnapshot.docs.isEmpty) {
-        return [];
-      }
-
-      final channelDoc = channelQuerySnapshot.docs.first;
-      final channelData = channelDoc.data();
-      final userId = channelData['userId'] as String;
-
       final querySnapshot = await _firestore
           .collection('users')
-          .doc(userId)
+          .doc(_currentUserId)
           .collection('channels')
           .doc(channelId)
           .collection('videos')
@@ -71,24 +69,10 @@ class VideoRepository implements IVideoRepository {
   @override
   Future<void> saveVideo(Video video) async {
     try {
-      // channelIdからuserIdを取得
-      final channelQuerySnapshot = await _firestore
-          .collectionGroup('channels')
-          .where('id', isEqualTo: video.channelId)
-          .limit(1)
-          .get();
-
-      if (channelQuerySnapshot.docs.isEmpty) {
-        throw Exception('Channel not found: ${video.channelId}');
-      }
-
-      final channelData = channelQuerySnapshot.docs.first.data();
-      final userId = channelData['userId'] as String;
-
       final videoModel = VideoModel.fromEntity(video);
       final videoRef = _firestore
           .collection('users')
-          .doc(userId)
+          .doc(_currentUserId)
           .collection('channels')
           .doc(video.channelId)
           .collection('videos')
@@ -106,24 +90,10 @@ class VideoRepository implements IVideoRepository {
     List<dynamic> videos,
   ) async {
     try {
-      // チャンネル情報を取得
-      final channelQuerySnapshot = await _firestore
-          .collectionGroup('channels')
-          .where('id', isEqualTo: channelId)
-          .limit(1)
-          .get();
-
-      if (channelQuerySnapshot.docs.isEmpty) {
-        throw Exception('Channel not found: $channelId');
-      }
-
-      final channelData = channelQuerySnapshot.docs.first.data();
-      final userId = channelData['userId'] as String;
-
       // 既存の動画IDリストを取得
       final existingVideos = await _firestore
           .collection('users')
-          .doc(userId)
+          .doc(_currentUserId)
           .collection('channels')
           .doc(channelId)
           .collection('videos')
@@ -143,7 +113,7 @@ class VideoRepository implements IVideoRepository {
       for (final videoId in videosToDelete) {
         await _firestore
             .collection('users')
-            .doc(userId)
+            .doc(_currentUserId)
             .collection('channels')
             .doc(channelId)
             .collection('videos')
@@ -177,23 +147,9 @@ class VideoRepository implements IVideoRepository {
   @override
   Future<void> deleteVideosByChannel(String channelId) async {
     try {
-      // チャンネル情報を取得
-      final channelQuerySnapshot = await _firestore
-          .collectionGroup('channels')
-          .where('id', isEqualTo: channelId)
-          .limit(1)
-          .get();
-
-      if (channelQuerySnapshot.docs.isEmpty) {
-        return;
-      }
-
-      final channelData = channelQuerySnapshot.docs.first.data();
-      final userId = channelData['userId'] as String;
-
       final videos = await _firestore
           .collection('users')
-          .doc(userId)
+          .doc(_currentUserId)
           .collection('channels')
           .doc(channelId)
           .collection('videos')
