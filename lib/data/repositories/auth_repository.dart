@@ -1,0 +1,129 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../domain/entities/user.dart';
+import '../../domain/repositories/auth_repository_interface.dart';
+import '../models/user_model.dart';
+import '../../config/constants.dart';
+
+/// 認証リポジトリの実装
+/// Firebase AuthenticationとGoogle Sign-Inを使用
+class AuthRepository implements IAuthRepository {
+  final firebase_auth.FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore _firestore;
+
+  AuthRepository({
+    firebase_auth.FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+    FirebaseFirestore? firestore,
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              scopes: AppConstants.googleScopes,
+            ),
+        _firestore = firestore ?? FirebaseFirestore.instance;
+
+  @override
+  Future<User?> getCurrentUser() async {
+    final firebaseUser = _firebaseAuth.currentUser;
+    if (firebaseUser == null) return null;
+
+    final userModel = UserModel.fromFirebaseUser(firebaseUser);
+    return userModel.toEntity();
+  }
+
+  @override
+  Future<User?> signInWithGoogle() async {
+    try {
+      // Google Sign-in フロー
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        // ユーザーがサインインをキャンセル
+        return null;
+      }
+
+      // Google認証情報を取得
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Firebase認証クレデンシャルを作成
+      final credential = firebase_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Firebaseにサインイン
+      final firebase_auth.UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) return null;
+
+      // UserModelに変換
+      final userModel = UserModel.fromFirebaseUser(firebaseUser);
+
+      // Firestoreにユーザー情報を保存（初回のみ）
+      await _saveUserToFirestore(userModel);
+
+      return userModel.toEntity();
+    } catch (e) {
+      // エラーハンドリング
+      print('Google Sign-in error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      await Future.wait([
+        _firebaseAuth.signOut(),
+        _googleSignIn.signOut(),
+      ]);
+    } catch (e) {
+      print('Sign-out error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Stream<User?> authStateChanges() {
+    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      if (firebaseUser == null) return null;
+      final userModel = UserModel.fromFirebaseUser(firebaseUser);
+      return userModel.toEntity();
+    });
+  }
+
+  /// Firestoreにユーザー情報を保存
+  Future<void> _saveUserToFirestore(UserModel userModel) async {
+    try {
+      final userDoc =
+          _firestore.collection(AppConstants.usersCollection).doc(userModel.uid);
+
+      // ドキュメントが存在するか確認
+      final docSnapshot = await userDoc.get();
+
+      if (!docSnapshot.exists) {
+        // 新規ユーザーの場合のみ保存
+        await userDoc.set({
+          ...userModel.toJson(),
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // 既存ユーザーの場合は更新
+        await userDoc.update({
+          'displayName': userModel.displayName,
+          'photoUrl': userModel.photoUrl,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      print('Error saving user to Firestore: $e');
+      // Firestoreへの保存エラーは致命的ではないので、続行
+    }
+  }
+}

@@ -70,52 +70,36 @@ Feedivoは、Google Drive上の動画コンテンツをポッドキャスト形�
 
 ## 🚀 セットアップ
 
-### 1. リポジトリのクローン
+### クイックスタート
 
 ```bash
+# リポジトリのクローン
 git clone https://github.com/noboru-i/feedivo.git
 cd feedivo
-```
 
-### 2. 依存パッケージのインストール
-
-```bash
+# 依存パッケージのインストール
 flutter pub get
+
+# アプリの起動
+flutter run -d chrome  # Webの場合
 ```
 
-### 3. Firebase設定
+### 詳細なセットアップ手順
 
-1. [Firebase Console](https://console.firebase.google.com/)でプロジェクトを作成
-2. iOS、Android、Webアプリを登録
-3. 各プラットフォームの設定ファイルをダウンロード：
-   - iOS: `GoogleService-Info.plist` → `ios/Runner/`
-   - Android: `google-services.json` → `android/app/`
-   - Web: Firebase設定を `web/index.html` に追加
+初回セットアップには、FirebaseとGoogle Cloudの設定が必要です。
 
-### 4. Google OAuth設定
+📖 **詳細手順はこちら**:
+- [Firebase & Google Cloud セットアップガイド](docs/setup/firebase-google-cloud-setup.md) - 新規環境構築（DEV/PROD）
+- [ローカル開発環境セットアップ](docs/setup/local-setup-instructions.md) - 既存プロジェクトのクローン後の設定
 
-1. [Google Cloud Console](https://console.cloud.google.com/)でプロジェクトを作成
-2. OAuth 2.0クライアントIDを作成（iOS、Android、Web用）
-3. 必要なスコープを有効化：
-   - `https://www.googleapis.com/auth/drive.readonly`
-   - `https://www.googleapis.com/auth/drive.metadata.readonly`
+**主な手順**:
+1. Firebaseプロジェクトの作成
+2. Google Cloud APIの有効化（Drive API, People API）
+3. OAuth同意画面の設定
+4. OAuth クライアントIDの作成（iOS/Android/Web）
+5. 設定ファイルの生成と配置
 
-### 5. 環境変数の設定
-
-`lib/config/` に環境別の設定ファイルを作成してください。
-
-### 6. アプリの起動
-
-```bash
-# iOS
-flutter run -d ios
-
-# Android
-flutter run -d android
-
-# Web
-flutter run -d chrome
-```
+詳細は上記ドキュメントを参照してください。
 
 ## 📁 プロジェクト構造
 

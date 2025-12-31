@@ -43,3 +43,31 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase configuration files (contain API keys and secrets)
+# DO NOT COMMIT THESE FILES TO PUBLIC REPOSITORIES
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+lib/firebase_options.dart
+
+# Environment variables
+.env
+.env.*
+
+# Signing keys (Android)
+*.jks
+*.keystore
+*.p12
+
+# Google Cloud Console credentials
+credentials.json
+service-account.json
+
+# Local settings
+settings.local.json
+
+# OAuth Client IDs and Firebase configuration
+# These files contain project-specific IDs and should be generated per environment
+web/index.html
+ios/Runner/Info.plist
+firebase.json
