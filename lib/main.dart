@@ -9,14 +9,18 @@ import 'config/constants.dart';
 import 'config/theme/app_theme.dart';
 import 'core/analytics/analytics_service.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/channel_cache_repository.dart';
 import 'data/repositories/channel_repository.dart';
 import 'data/repositories/google_drive_repository.dart';
 import 'data/repositories/playback_repository.dart';
+import 'data/repositories/video_cache_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
+import 'domain/repositories/channel_cache_repository_interface.dart';
 import 'domain/repositories/channel_repository_interface.dart';
 import 'domain/repositories/google_drive_repository_interface.dart';
 import 'domain/repositories/playback_repository_interface.dart';
+import 'domain/repositories/video_cache_repository_interface.dart';
 import 'domain/repositories/video_repository_interface.dart';
 import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
@@ -55,7 +59,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // Phase 2: Repositories
+        // Phase 2: Repositories - Base Dependencies
         Provider<IGoogleDriveRepository>(
           create: (_) => GoogleDriveRepository(
             driveService: GoogleDriveService(
@@ -64,26 +68,38 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+
+        // Phase 3: Analytics
+        Provider<AnalyticsService>(
+          create: (_) => AnalyticsService(),
+        ),
+
+        // Phase 3: Cache Repositories
+        Provider<IChannelCacheRepository>(
+          create: (_) => ChannelCacheRepository(),
+        ),
+        Provider<IVideoCacheRepository>(
+          create: (_) => VideoCacheRepository(),
+        ),
+
+        // Phase 2: Repositories - Dependent on Cache
         Provider<IChannelRepository>(
           create: (context) => ChannelRepository(
             firestore: FirebaseFirestore.instance,
             driveRepo: context.read<IGoogleDriveRepository>(),
+            cacheRepo: context.read<IChannelCacheRepository>(),
           ),
         ),
         Provider<IVideoRepository>(
-          create: (_) => VideoRepository(
+          create: (context) => VideoRepository(
             firestore: FirebaseFirestore.instance,
+            cacheRepo: context.read<IVideoCacheRepository>(),
           ),
         ),
         Provider<IPlaybackRepository>(
           create: (_) => PlaybackRepository(
             firestore: FirebaseFirestore.instance,
           ),
-        ),
-
-        // Phase 3: Analytics
-        Provider<AnalyticsService>(
-          create: (_) => AnalyticsService(),
         ),
 
         // Phase 2: Providers
