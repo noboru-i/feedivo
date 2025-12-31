@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
@@ -188,4 +189,203 @@ class HistoryListItem extends StatelessWidget {
       return '${lastPlayedAt.year}年${lastPlayedAt.month}月${lastPlayedAt.day}日';
     }
   }
+}
+
+// Widget Previews
+
+Video _createSampleVideo({
+  required String id,
+  required String title,
+  required String description,
+  required int duration,
+}) {
+  return Video(
+    id: id,
+    channelId: 'sample-channel',
+    title: title,
+    description: description,
+    videoFileId: 'sample-video-file-id',
+    thumbnailFileId: 'sample-thumbnail-file-id',
+    duration: duration,
+    publishedAt: DateTime.now().subtract(const Duration(days: 7)),
+  );
+}
+
+PlaybackPosition _createSamplePosition({
+  required String videoId,
+  required int position,
+  required int duration,
+  required DateTime lastPlayedAt,
+  required bool isCompleted,
+}) {
+  return PlaybackPosition(
+    videoId: videoId,
+    channelId: 'sample-channel',
+    position: position,
+    duration: duration,
+    lastPlayedAt: lastPlayedAt,
+    isCompleted: isCompleted,
+  );
+}
+
+@Preview(
+  group: 'HistoryListItem',
+  name: 'Light - In Progress (50%)',
+  brightness: Brightness.light,
+)
+Widget historyListItemInProgress() {
+  final video = _createSampleVideo(
+    id: 'video-1',
+    title: 'Flutterの基礎を学ぼう',
+    description: 'Flutterの基本的な使い方と、ウィジェットの概念について解説します。',
+    duration: 630, // 10:30
+  );
+
+  final position = _createSamplePosition(
+    videoId: 'video-1',
+    position: 315, // 5:15 (50%)
+    duration: 630,
+    lastPlayedAt: DateTime.now().subtract(const Duration(hours: 2)),
+    isCompleted: false,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: HistoryListItem(
+        position: position,
+        video: video,
+        onTap: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'HistoryListItem',
+  name: 'Dark - In Progress (50%)',
+  brightness: Brightness.dark,
+)
+Widget historyListItemDark() {
+  final video = _createSampleVideo(
+    id: 'video-1',
+    title: 'Flutterの基礎を学ぼう',
+    description: 'Flutterの基本的な使い方と、ウィジェットの概念について解説します。',
+    duration: 630, // 10:30
+  );
+
+  final position = _createSamplePosition(
+    videoId: 'video-1',
+    position: 315, // 5:15 (50%)
+    duration: 630,
+    lastPlayedAt: DateTime.now().subtract(const Duration(hours: 2)),
+    isCompleted: false,
+  );
+
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: Scaffold(
+      body: HistoryListItem(
+        position: position,
+        video: video,
+        onTap: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'HistoryListItem',
+  name: 'Completed',
+  brightness: Brightness.light,
+)
+Widget historyListItemCompleted() {
+  final video = _createSampleVideo(
+    id: 'video-2',
+    title: '状態管理の実装パターン',
+    description: 'Provider、Riverpod、Blocなど、様々な状態管理手法を比較しながら解説します。',
+    duration: 1800, // 30:00
+  );
+
+  final position = _createSamplePosition(
+    videoId: 'video-2',
+    position: 1800,
+    duration: 1800,
+    lastPlayedAt: DateTime.now().subtract(const Duration(days: 1)),
+    isCompleted: true,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: HistoryListItem(
+        position: position,
+        video: video,
+        onTap: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'HistoryListItem',
+  name: 'Just Watched (5 minutes ago)',
+  brightness: Brightness.light,
+)
+Widget historyListItemRecent() {
+  final video = _createSampleVideo(
+    id: 'video-3',
+    title: 'アニメーションの実装方法',
+    description: 'Flutterで美しいアニメーションを実装する方法を、実例を交えて詳しく解説します。',
+    duration: 1200, // 20:00
+  );
+
+  final position = _createSamplePosition(
+    videoId: 'video-3',
+    position: 800, // 13:20 (66%)
+    duration: 1200,
+    lastPlayedAt: DateTime.now().subtract(const Duration(minutes: 5)),
+    isCompleted: false,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: HistoryListItem(
+        position: position,
+        video: video,
+        onTap: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'HistoryListItem',
+  name: 'Long Text Overflow',
+  brightness: Brightness.light,
+)
+Widget historyListItemLongText() {
+  final video = _createSampleVideo(
+    id: 'video-4',
+    title: 'とても長いタイトルがここに表示されますがオーバーフローで省略されるはずです',
+    description:
+        'とても長い説明文がここに表示されます。この説明文は複数行になる可能性がありますが、最大2行までしか表示されずに省略記号が表示されるはずです。',
+    duration: 3600, // 1:00:00
+  );
+
+  final position = _createSamplePosition(
+    videoId: 'video-4',
+    position: 1800, // 30:00 (50%)
+    duration: 3600,
+    lastPlayedAt: DateTime.now().subtract(const Duration(days: 7)),
+    isCompleted: false,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: HistoryListItem(
+        position: position,
+        video: video,
+        onTap: () {},
+      ),
+    ),
+  );
 }

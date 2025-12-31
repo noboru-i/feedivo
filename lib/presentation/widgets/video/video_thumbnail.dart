@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
@@ -62,4 +63,97 @@ class VideoThumbnail extends StatelessWidget {
       ),
     );
   }
+}
+
+// Widget Previews
+
+@Preview(
+  group: 'VideoThumbnail',
+  name: 'Light - With Thumbnail ID',
+  brightness: Brightness.light,
+)
+Widget videoThumbnailLight() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: VideoThumbnail(
+          thumbnailFileId: 'sample-thumbnail-id',
+          width: 200,
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoThumbnail',
+  name: 'Dark - With Thumbnail ID',
+  brightness: Brightness.dark,
+)
+Widget videoThumbnailDark() {
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: const Scaffold(
+      body: Center(
+        child: VideoThumbnail(
+          thumbnailFileId: 'sample-thumbnail-id',
+          width: 200,
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoThumbnail',
+  name: 'No Thumbnail - Placeholder',
+  brightness: Brightness.light,
+)
+Widget videoThumbnailPlaceholder() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: VideoThumbnail(
+          width: 200,
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoThumbnail',
+  name: 'Wide Aspect Ratio',
+  brightness: Brightness.light,
+)
+Widget videoThumbnailWide() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: VideoThumbnail(
+          thumbnailFileId: 'sample-thumbnail-id',
+          width: 300,
+          height: 169, // 16:9 aspect ratio
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoThumbnail',
+  name: 'Small Size',
+  brightness: Brightness.light,
+)
+Widget videoThumbnailSmall() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: VideoThumbnail(
+          width: 100,
+          height: 60,
+        ),
+      ),
+    ),
+  );
 }

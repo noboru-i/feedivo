@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../../config/theme/app_colors.dart';
 
@@ -58,4 +59,88 @@ class ErrorDisplay extends StatelessWidget {
       ),
     );
   }
+}
+
+// Widget Previews
+
+@Preview(
+  group: 'ErrorDisplay',
+  name: 'Light - With Retry',
+  brightness: Brightness.light,
+)
+Widget errorDisplayWithRetry() {
+  return MaterialApp(
+    home: Scaffold(
+      body: ErrorDisplay(
+        message: 'データの読み込みに失敗しました',
+        onRetry: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ErrorDisplay',
+  name: 'Dark - With Retry',
+  brightness: Brightness.dark,
+)
+Widget errorDisplayDark() {
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: Scaffold(
+      body: ErrorDisplay(
+        message: 'データの読み込みに失敗しました',
+        onRetry: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ErrorDisplay',
+  name: 'Without Retry Button',
+  brightness: Brightness.light,
+)
+Widget errorDisplayWithoutRetry() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: ErrorDisplay(
+        message: 'このコンテンツは利用できません',
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ErrorDisplay',
+  name: 'Network Error',
+  brightness: Brightness.light,
+)
+Widget errorDisplayNetworkError() {
+  return MaterialApp(
+    home: Scaffold(
+      body: ErrorDisplay(
+        message: 'ネットワークに接続できません\nインターネット接続を確認してください',
+        icon: Icons.wifi_off,
+        onRetry: () {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ErrorDisplay',
+  name: 'Long Error Message',
+  brightness: Brightness.light,
+)
+Widget errorDisplayLongMessage() {
+  return MaterialApp(
+    home: Scaffold(
+      body: ErrorDisplay(
+        message:
+            'データの読み込み中に予期しないエラーが発生しました。しばらく時間をおいてから再度お試しください。問題が解決しない場合は、アプリを再起動してください。',
+        onRetry: () {},
+      ),
+    ),
+  );
 }

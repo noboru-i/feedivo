@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 import 'package:provider/provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../data/repositories/playback_repository.dart';
+import '../../../domain/entities/playback_position.dart';
 import '../../../domain/entities/video.dart';
 import '../../providers/playback_provider.dart';
 import 'duration_badge.dart';
@@ -185,4 +189,195 @@ class VideoListItem extends StatelessWidget {
       return '${date.year}年${date.month}月${date.day}日';
     }
   }
+}
+
+// Widget Previews
+
+/// Mock PlaybackProvider for previews
+class _MockPlaybackProvider extends PlaybackProvider {
+  _MockPlaybackProvider(this._mockPosition)
+    : super(
+        PlaybackRepository(
+          firestore: FirebaseFirestore.instance,
+        ),
+      );
+
+  final PlaybackPosition? _mockPosition;
+
+  @override
+  PlaybackPosition? getPosition(String videoId) => _mockPosition;
+}
+
+Video _createSampleVideo({
+  required String id,
+  required String title,
+  required String description,
+  required int duration,
+  required DateTime publishedAt,
+}) {
+  return Video(
+    id: id,
+    channelId: 'sample-channel',
+    title: title,
+    description: description,
+    videoFileId: 'sample-video-file-id',
+    thumbnailFileId: 'sample-thumbnail-file-id',
+    duration: duration,
+    publishedAt: publishedAt,
+  );
+}
+
+@Preview(
+  group: 'VideoListItem',
+  name: 'Light - Not Started',
+  brightness: Brightness.light,
+)
+Widget videoListItemNotStarted() {
+  final video = _createSampleVideo(
+    id: 'video-1',
+    title: 'Flutterの基礎を学ぼう',
+    description: 'Flutterの基本的な使い方と、ウィジェットの概念について解説します。',
+    duration: 630, // 10:30
+    publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: ChangeNotifierProvider<PlaybackProvider>(
+        create: (_) => _MockPlaybackProvider(null),
+        child: VideoListItem(
+          video: video,
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoListItem',
+  name: 'Dark - Not Started',
+  brightness: Brightness.dark,
+)
+Widget videoListItemDark() {
+  final video = _createSampleVideo(
+    id: 'video-1',
+    title: 'Flutterの基礎を学ぼう',
+    description: 'Flutterの基本的な使い方と、ウィジェットの概念について解説します。',
+    duration: 630, // 10:30
+    publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+  );
+
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: Scaffold(
+      body: ChangeNotifierProvider<PlaybackProvider>(
+        create: (_) => _MockPlaybackProvider(null),
+        child: VideoListItem(
+          video: video,
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoListItem',
+  name: 'In Progress (50%)',
+  brightness: Brightness.light,
+)
+Widget videoListItemInProgress() {
+  final video = _createSampleVideo(
+    id: 'video-2',
+    title: '状態管理の実装パターン',
+    description: 'Provider、Riverpod、Blocなど、様々な状態管理手法を比較しながら解説します。',
+    duration: 1800, // 30:00
+    publishedAt: DateTime.now().subtract(const Duration(days: 5)),
+  );
+
+  final position = PlaybackPosition(
+    videoId: 'video-2',
+    channelId: 'sample-channel',
+    position: 900, // 15:00 (50%)
+    duration: 1800,
+    lastPlayedAt: DateTime.now().subtract(const Duration(hours: 2)),
+    isCompleted: false,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: ChangeNotifierProvider<PlaybackProvider>(
+        create: (_) => _MockPlaybackProvider(position),
+        child: VideoListItem(
+          video: video,
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoListItem',
+  name: 'Completed',
+  brightness: Brightness.light,
+)
+Widget videoListItemCompleted() {
+  final video = _createSampleVideo(
+    id: 'video-3',
+    title: 'アニメーションの実装方法',
+    description: 'Flutterで美しいアニメーションを実装する方法を、実例を交えて詳しく解説します。',
+    duration: 1200, // 20:00
+    publishedAt: DateTime.now().subtract(const Duration(days: 10)),
+  );
+
+  final position = PlaybackPosition(
+    videoId: 'video-3',
+    channelId: 'sample-channel',
+    position: 1200,
+    duration: 1200,
+    lastPlayedAt: DateTime.now().subtract(const Duration(days: 1)),
+    isCompleted: true,
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: ChangeNotifierProvider<PlaybackProvider>(
+        create: (_) => _MockPlaybackProvider(position),
+        child: VideoListItem(
+          video: video,
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'VideoListItem',
+  name: 'Long Title and Description',
+  brightness: Brightness.light,
+)
+Widget videoListItemLongText() {
+  final video = _createSampleVideo(
+    id: 'video-4',
+    title: 'とても長いタイトルがここに表示されますがオーバーフローで省略されるはずです',
+    description:
+        'とても長い説明文がここに表示されます。この説明文は複数行になる可能性がありますが、最大3行までしか表示されずに省略記号が表示されるはずです。さらに追加のテキストを入れて、オーバーフローの動作を確認します。',
+    duration: 3600, // 1:00:00
+    publishedAt: DateTime.now().subtract(const Duration(days: 365)),
+  );
+
+  return MaterialApp(
+    home: Scaffold(
+      body: ChangeNotifierProvider<PlaybackProvider>(
+        create: (_) => _MockPlaybackProvider(null),
+        child: VideoListItem(
+          video: video,
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
 }

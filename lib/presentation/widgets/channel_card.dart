@@ -141,7 +141,8 @@ Widget channelCardLightPurple() {
           channel: createSampleChannel(
             id: 'channel-1',
             name: 'テクノロジーチャンネル',
-            description: '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
+            description:
+                '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
           ),
           onTap: () {},
         ),
@@ -164,7 +165,8 @@ Widget channelCardDarkPurple() {
           channel: createSampleChannel(
             id: 'channel-1',
             name: 'テクノロジーチャンネル',
-            description: '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
+            description:
+                '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
           ),
           onTap: () {},
         ),

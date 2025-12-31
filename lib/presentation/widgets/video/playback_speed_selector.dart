@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
@@ -98,6 +99,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
   }
 
   /// ボトムシートを表示
+  // ignore: unreachable_from_main
   static void show(
     BuildContext context, {
     required double currentSpeed,
@@ -116,4 +118,87 @@ class PlaybackSpeedSelector extends StatelessWidget {
       ),
     );
   }
+}
+
+// Widget Previews
+
+@Preview(
+  group: 'PlaybackSpeedSelector',
+  name: 'Light - Normal Speed (1.0x)',
+  brightness: Brightness.light,
+)
+Widget playbackSpeedSelectorNormal() {
+  return MaterialApp(
+    home: Scaffold(
+      body: PlaybackSpeedSelector(
+        currentSpeed: 1,
+        onSpeedSelected: (speed) {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'PlaybackSpeedSelector',
+  name: 'Dark - Normal Speed (1.0x)',
+  brightness: Brightness.dark,
+)
+Widget playbackSpeedSelectorDark() {
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: Scaffold(
+      body: PlaybackSpeedSelector(
+        currentSpeed: 1,
+        onSpeedSelected: (speed) {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'PlaybackSpeedSelector',
+  name: 'Slow Speed (0.75x)',
+  brightness: Brightness.light,
+)
+Widget playbackSpeedSelectorSlow() {
+  return MaterialApp(
+    home: Scaffold(
+      body: PlaybackSpeedSelector(
+        currentSpeed: 0.75,
+        onSpeedSelected: (speed) {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'PlaybackSpeedSelector',
+  name: 'Fast Speed (1.5x)',
+  brightness: Brightness.light,
+)
+Widget playbackSpeedSelectorFast() {
+  return MaterialApp(
+    home: Scaffold(
+      body: PlaybackSpeedSelector(
+        currentSpeed: 1.5,
+        onSpeedSelected: (speed) {},
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'PlaybackSpeedSelector',
+  name: 'Maximum Speed (2.0x)',
+  brightness: Brightness.light,
+)
+Widget playbackSpeedSelectorMaximum() {
+  return MaterialApp(
+    home: Scaffold(
+      body: PlaybackSpeedSelector(
+        currentSpeed: 2,
+        onSpeedSelected: (speed) {},
+      ),
+    ),
+  );
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
@@ -49,4 +50,92 @@ class DurationBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+// Widget Previews
+
+@Preview(
+  group: 'DurationBadge',
+  name: 'Short Video (45 seconds)',
+  brightness: Brightness.light,
+)
+Widget durationBadgeShort() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: DurationBadge(
+          duration: 45, // 00:45
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'DurationBadge',
+  name: 'Medium Video (10:30)',
+  brightness: Brightness.light,
+)
+Widget durationBadgeMedium() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: DurationBadge(
+          duration: 630, // 10:30
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'DurationBadge',
+  name: 'Long Video (1:30:45)',
+  brightness: Brightness.light,
+)
+Widget durationBadgeLong() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: DurationBadge(
+          duration: 5445, // 01:30:45
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'DurationBadge',
+  name: 'Very Long Video (10:05:30)',
+  brightness: Brightness.light,
+)
+Widget durationBadgeVeryLong() {
+  return const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: DurationBadge(
+          duration: 36330, // 10:05:30
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'DurationBadge',
+  name: 'Dark Mode',
+  brightness: Brightness.dark,
+)
+Widget durationBadgeDark() {
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: const Scaffold(
+      body: Center(
+        child: DurationBadge(
+          duration: 630, // 10:30
+        ),
+      ),
+    ),
+  );
 }
