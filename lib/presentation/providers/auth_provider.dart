@@ -36,7 +36,10 @@ class AuthProvider extends ChangeNotifier {
 
     // Web版: Google Sign-in authenticationEventsを監視
     if (kIsWeb) {
+      print('[AuthProvider] Web版: authenticationEventsのリスニング開始');
       GoogleSignIn.instance.authenticationEvents.listen((event) async {
+        print('[AuthProvider] authenticationEventを受信: $event');
+
         try {
           final googleUser = switch (event) {
             GoogleSignInAuthenticationEventSignIn() => event.user,
@@ -44,28 +47,34 @@ class AuthProvider extends ChangeNotifier {
           };
 
           if (googleUser != null) {
+            print('[AuthProvider] Googleユーザー: ${googleUser.displayName}');
+
             // Google認証情報を取得 (v7.xでは同期的)
             final googleAuth = googleUser.authentication;
+            print('[AuthProvider] idToken取得: ${googleAuth.idToken != null}');
 
             // Firebase認証クレデンシャルを作成
-            // Web版ではaccessTokenがないため、idTokenのみを使用
             final credential = firebase_auth.GoogleAuthProvider.credential(
               idToken: googleAuth.idToken,
             );
 
+            print('[AuthProvider] Firebaseサインイン開始');
             // Firebaseにサインイン
             final userCredential = await firebase_auth.FirebaseAuth.instance
                 .signInWithCredential(credential);
 
+            print('[AuthProvider] Firebaseサインイン成功');
             // ユーザー情報を処理
             final user = await _authRepository.handleWebAuthentication(
               userCredential,
             );
 
             _currentUser = user;
+            print('[AuthProvider] currentUserを更新: ${user?.displayName}');
             notifyListeners();
           }
         } on Exception catch (e) {
+          print('[AuthProvider] Web認証エラー: $e');
           _errorMessage = 'Web認証に失敗しました: $e';
           notifyListeners();
         }

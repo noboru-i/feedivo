@@ -12,13 +12,70 @@ import '../../widgets/google_sign_in_button_web.dart';
 
 /// ログイン画面
 /// Google Sign-inでの認証を行う
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  AuthProvider? _authProvider;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Web版: 認証状態の変更を監視して画面遷移
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Analytics: 画面表示
+        context.read<AnalyticsService>().logScreenView('login');
+
+        print('[LoginScreen] Web版: 認証状態の監視開始');
+        _authProvider = context.read<AuthProvider>();
+        _authProvider!.addListener(_onAuthStateChanged);
+      });
+    } else {
+      // モバイル版: Analytics
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AnalyticsService>().logScreenView('login');
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (kIsWeb && _authProvider != null) {
+      _authProvider!.removeListener(_onAuthStateChanged);
+    }
+    super.dispose();
+  }
+
+  void _onAuthStateChanged() {
+    if (_authProvider == null) {
+      return;
+    }
+
+    print('[LoginScreen] 認証状態変更検知');
+    print('[LoginScreen] isAuthenticated: ${_authProvider!.isAuthenticated}');
+
+    if (_authProvider!.isAuthenticated && mounted) {
+      print('[LoginScreen] ログイン成功、/homeに遷移');
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (_authProvider!.errorMessage != null && mounted) {
+      print('[LoginScreen] エラー: ${_authProvider!.errorMessage}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_authProvider!.errorMessage!),
+          backgroundColor: AppColors.errorColor,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Analytics: 画面表示
-    context.read<AnalyticsService>().logScreenView('login');
 
     return Scaffold(
       body: DecoratedBox(
