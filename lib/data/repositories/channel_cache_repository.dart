@@ -82,8 +82,9 @@ class ChannelCacheRepository implements IChannelCacheRepository {
 
   /// MapからChannelエンティティに変換
   Channel _fromMap(Map<String, dynamic> map) {
-    final updatedAt =
-        DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int);
+    final updatedAt = DateTime.fromMillisecondsSinceEpoch(
+      map['updated_at'] as int,
+    );
     return Channel(
       id: map['id'] as String,
       userId: map['user_id'] as String,
