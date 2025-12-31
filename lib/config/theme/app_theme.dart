@@ -182,18 +182,19 @@ class AppTheme {
       ),
 
       // Text Theme
-      textTheme: const TextTheme(
-        displayLarge: AppTypography.h1,
-        displayMedium: AppTypography.h2,
-        displaySmall: AppTypography.h3,
-        bodyLarge: AppTypography.body1,
-        bodyMedium: AppTypography.body2,
-        bodySmall: AppTypography.caption,
-        labelLarge: AppTypography.button,
-      ).apply(
-        bodyColor: AppColors.primaryText,
-        displayColor: AppColors.primaryText,
-      ),
+      textTheme:
+          const TextTheme(
+            displayLarge: AppTypography.h1,
+            displayMedium: AppTypography.h2,
+            displaySmall: AppTypography.h3,
+            bodyLarge: AppTypography.body1,
+            bodyMedium: AppTypography.body2,
+            bodySmall: AppTypography.caption,
+            labelLarge: AppTypography.button,
+          ).apply(
+            bodyColor: AppColors.primaryText,
+            displayColor: AppColors.primaryText,
+          ),
     );
   }
 
@@ -226,8 +227,9 @@ class AppTheme {
         foregroundColor: AppColors.darkPrimaryText,
         elevation: AppDimensions.elevation2,
         centerTitle: false,
-        titleTextStyle:
-            AppTypography.h2.copyWith(color: AppColors.darkPrimaryText),
+        titleTextStyle: AppTypography.h2.copyWith(
+          color: AppColors.darkPrimaryText,
+        ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
 
@@ -272,18 +274,19 @@ class AppTheme {
       ),
 
       // Text Theme
-      textTheme: const TextTheme(
-        displayLarge: AppTypography.h1,
-        displayMedium: AppTypography.h2,
-        displaySmall: AppTypography.h3,
-        bodyLarge: AppTypography.body1,
-        bodyMedium: AppTypography.body2,
-        bodySmall: AppTypography.caption,
-        labelLarge: AppTypography.button,
-      ).apply(
-        bodyColor: AppColors.darkPrimaryText,
-        displayColor: AppColors.darkPrimaryText,
-      ),
+      textTheme:
+          const TextTheme(
+            displayLarge: AppTypography.h1,
+            displayMedium: AppTypography.h2,
+            displaySmall: AppTypography.h3,
+            bodyLarge: AppTypography.body1,
+            bodyMedium: AppTypography.body2,
+            bodySmall: AppTypography.caption,
+            labelLarge: AppTypography.button,
+          ).apply(
+            bodyColor: AppColors.darkPrimaryText,
+            displayColor: AppColors.darkPrimaryText,
+          ),
     );
   }
 }

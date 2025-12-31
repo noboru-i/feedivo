@@ -10,17 +10,17 @@ import '../models/user_model.dart';
 /// 認証リポジトリの実装
 /// Firebase AuthenticationとGoogle Sign-Inを使用
 class AuthRepository implements IAuthRepository {
-
   AuthRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
-  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ??
-            GoogleSignIn(
-              scopes: AppConstants.googleScopes,
-            ),
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+       _googleSignIn =
+           googleSignIn ??
+           GoogleSignIn(
+             scopes: AppConstants.googleScopes,
+           ),
+       _firestore = firestore ?? FirebaseFirestore.instance;
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
@@ -28,7 +28,9 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<User?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
-    if (firebaseUser == null) return null;
+    if (firebaseUser == null) {
+      return null;
+    }
 
     final userModel = UserModel.fromFirebaseUser(firebaseUser);
     return userModel.toEntity();
@@ -45,8 +47,7 @@ class AuthRepository implements IAuthRepository {
       }
 
       // Google認証情報を取得
-      final googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
       // Firebase認証クレデンシャルを作成
       final credential = firebase_auth.GoogleAuthProvider.credential(
@@ -55,11 +56,14 @@ class AuthRepository implements IAuthRepository {
       );
 
       // Firebaseにサインイン
-      final userCredential =
-          await _firebaseAuth.signInWithCredential(credential);
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
 
       final firebaseUser = userCredential.user;
-      if (firebaseUser == null) return null;
+      if (firebaseUser == null) {
+        return null;
+      }
 
       // UserModelに変換
       final userModel = UserModel.fromFirebaseUser(firebaseUser);
@@ -68,7 +72,7 @@ class AuthRepository implements IAuthRepository {
       await _saveUserToFirestore(userModel);
 
       return userModel.toEntity();
-    } catch (e) {
+    } on Exception catch (e) {
       // エラーハンドリング
       print('Google Sign-in error: $e');
       rethrow;
@@ -91,7 +95,9 @@ class AuthRepository implements IAuthRepository {
   @override
   Stream<User?> authStateChanges() {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      if (firebaseUser == null) return null;
+      if (firebaseUser == null) {
+        return null;
+      }
       final userModel = UserModel.fromFirebaseUser(firebaseUser);
       return userModel.toEntity();
     });
@@ -100,8 +106,9 @@ class AuthRepository implements IAuthRepository {
   /// Firestoreにユーザー情報を保存
   Future<void> _saveUserToFirestore(UserModel userModel) async {
     try {
-      final userDoc =
-          _firestore.collection(AppConstants.usersCollection).doc(userModel.uid);
+      final userDoc = _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userModel.uid);
 
       // ドキュメントが存在するか確認
       final docSnapshot = await userDoc.get();
@@ -121,7 +128,7 @@ class AuthRepository implements IAuthRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }
-    } catch (e) {
+    } on Exception catch (e) {
       print('Error saving user to Firestore: $e');
       // Firestoreへの保存エラーは致命的ではないので、続行
     }

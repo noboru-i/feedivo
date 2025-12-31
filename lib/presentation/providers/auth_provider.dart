@@ -5,7 +5,6 @@ import '../../domain/repositories/auth_repository_interface.dart';
 /// 認証状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class AuthProvider extends ChangeNotifier {
-
   AuthProvider(this._authRepository) {
     _initialize();
   }
@@ -45,7 +44,7 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return user != null;
-    } catch (e) {
+    } on Exception catch (e) {
       _isLoading = false;
       _errorMessage = 'サインインに失敗しました: $e';
       notifyListeners();
@@ -64,7 +63,7 @@ class AuthProvider extends ChangeNotifier {
       _currentUser = null;
       _isLoading = false;
       notifyListeners();
-    } catch (e) {
+    } on Exception catch (e) {
       _isLoading = false;
       _errorMessage = 'サインアウトに失敗しました: $e';
       notifyListeners();

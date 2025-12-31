@@ -1,7 +1,6 @@
 /// ユーザーエンティティ
 /// ドメイン層のビジネスロジックで使用する純粋なDartオブジェクト
 class User {
-
   User({
     required this.uid,
     required this.email,
@@ -15,7 +14,9 @@ class User {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+    if (identical(this, other)) {
+      return true;
+    }
 
     return other is User &&
         other.uid == uid &&

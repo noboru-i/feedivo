@@ -4,4 +4,8 @@ linter:
   rules:
     # avoid_print is disabled temporarily for development
     avoid_print: false
+    # flutter_style_todos is disabled (we use standard TODO format)
+    flutter_style_todos: false
+    # lines_longer_than_80_chars is disabled (we prefer readability over strict line length)
+    lines_longer_than_80_chars: false
 

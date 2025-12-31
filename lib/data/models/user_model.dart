@@ -4,7 +4,6 @@ import '../../domain/entities/user.dart';
 /// UserエンティティのData層モデル
 /// FirebaseのUserオブジェクトとDomain層のUserエンティティを相互変換
 class UserModel {
-
   UserModel({
     required this.uid,
     required this.email,
