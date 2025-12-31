@@ -80,8 +80,8 @@ Feedivoは、Google Drive上の動画コンテンツをポッドキャスト形�
 ### 開発環境
 - Flutter SDK: 3.38.5以上
 - Dart: 3.10.4以上
-- iOS: 14.0以上
-- Android: API 26 (Android 8.0)以上
+- iOS: 16.0以上
+- Android: API 33 (Android 13)以上
 
 ### アカウント
 - Googleアカウント（OAuth認証用）
