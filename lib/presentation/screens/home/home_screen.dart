@@ -1,19 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
-import '../../../config/theme/app_typography.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/channel_provider.dart';
+import '../../widgets/channel_card.dart';
+import '../../widgets/empty_state_widget.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // チャンネル一覧を読み込み
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadChannels();
+    });
+  }
+
+  Future<void> _loadChannels() async {
+    final authProvider = context.read<AuthProvider>();
+    final channelProvider = context.read<ChannelProvider>();
+
+    final userId = authProvider.currentUser?.uid;
+    if (userId != null) {
+      await channelProvider.loadChannels(userId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('マイチャンネル'),
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -32,11 +62,10 @@ class HomeScreen extends StatelessWidget {
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: チャンネル追加画面への遷移
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('チャンネル追加機能は準備中です')),
-          );
+          Navigator.pushNamed(context, '/add-channel');
         },
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.onPrimary,
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
@@ -44,36 +73,71 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    // TODO: Phase 2でチャンネルリストを実装
-    // 現在はEmpty Stateを表示
-    return _buildEmptyState();
-  }
+    return Consumer<ChannelProvider>(
+      builder: (context, channelProvider, child) {
+        if (channelProvider.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            '📺',
-            style: TextStyle(fontSize: AppDimensions.iconSizeXXL),
-          ),
-          const SizedBox(height: AppDimensions.spacingM),
-          Text(
-            'チャンネルを追加してください',
-            style: AppTypography.body1.copyWith(
-              color: AppColors.primaryText,
+        if (channelProvider.errorMessage != null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.errorColor,
+                ),
+                const SizedBox(height: AppDimensions.spacingM),
+                Text(
+                  channelProvider.errorMessage!,
+                  style: const TextStyle(color: AppColors.errorColor),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppDimensions.spacingM),
+                ElevatedButton(
+                  onPressed: _loadChannels,
+                  child: const Text('再試行'),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: AppDimensions.spacingS),
-          Text(
-            'FABボタンをタップして開始',
-            style: AppTypography.body2.copyWith(
-              color: AppColors.secondaryText,
+          );
+        }
+
+        if (channelProvider.channels.isEmpty) {
+          return const EmptyStateWidget(
+            icon: Icons.video_library,
+            message: 'チャンネルを追加してください',
+            subMessage: 'FABボタンをタップして開始',
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _loadChannels,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(
+              top: AppDimensions.spacingM,
+              bottom: 80, // FABの分の余白
             ),
+            itemCount: channelProvider.channels.length,
+            itemBuilder: (context, index) {
+              final channel = channelProvider.channels[index];
+              return ChannelCard(
+                channel: channel,
+                onTap: () {
+                  // TODO: Phase 2-3でチャンネル詳細画面に遷移
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('チャンネル詳細は準備中です')),
+                  );
+                },
+              );
+            },
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -94,6 +158,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ],
       onTap: (index) {
+        if (index == 2) {
+          Navigator.pushNamed(context, '/settings');
+        }
         // TODO: Phase 2で各画面への遷移を実装
       },
     );
