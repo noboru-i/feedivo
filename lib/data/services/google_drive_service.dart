@@ -78,7 +78,7 @@ class GoogleDriveService {
     try {
       final token = await getAccessToken();
       final url = Uri.parse(
-        '$_baseUrl/files/$fileId?fields=id,name,mimeType,size,modifiedTime,createdTime',
+        '$_baseUrl/files/$fileId?fields=id,name,mimeType,size,modifiedTime,createdTime,parents',
       );
 
       final response = await _httpClient.get(
@@ -91,6 +91,55 @@ class GoogleDriveService {
       _handleHttpError(response, fileId);
 
       return json.decode(response.body) as Map<String, dynamic>;
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  /// フォルダ内のファイル一覧を取得
+  /// [folderId] 親フォルダのID
+  /// [mimeTypeFilter] MIMEタイプでフィルタ（例: 'video/mp4'）
+  Future<List<Map<String, dynamic>>> listFilesInFolder(
+    String folderId, {
+    String? mimeTypeFilter,
+  }) async {
+    try {
+      final token = await getAccessToken();
+
+      // クエリの構築
+      var query = "'$folderId' in parents";
+      if (mimeTypeFilter != null) {
+        query += " and mimeType='$mimeTypeFilter'";
+      }
+      // トラッシュを除外
+      query += ' and trashed=false';
+
+      final url = Uri.parse(
+        '$_baseUrl/files?q=${Uri.encodeComponent(query)}&fields=files(id,name,mimeType,createdTime,modifiedTime)&pageSize=100',
+      );
+
+      final response = await _httpClient.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw DriveApiException(
+          'フォルダ内のファイル一覧取得に失敗しました: ${response.statusCode}',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final files = data['files'] as List<dynamic>?;
+
+      if (files == null) {
+        return [];
+      }
+
+      return files.cast<Map<String, dynamic>>();
     } on Exception {
       rethrow;
     }

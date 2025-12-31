@@ -28,19 +28,17 @@ class ChannelConfigModel {
       throw InvalidConfigException('チャンネル情報が見つかりません');
     }
 
-    // 動画リストのバリデーション
+    // 動画リストのバリデーション（nullの場合は空リスト = 自動検出モード）
     final videosData = json['videos'] as List<dynamic>?;
-    if (videosData == null) {
-      throw InvalidConfigException('動画リストが見つかりません');
-    }
 
     try {
       return ChannelConfigModel(
         version: version,
         channelInfo: ChannelInfoModel.fromJson(channelData),
         videos: videosData
-            .map((v) => VideoInfoModel.fromJson(v as Map<String, dynamic>))
-            .toList(),
+                ?.map((v) => VideoInfoModel.fromJson(v as Map<String, dynamic>))
+                .toList() ??
+            [],
       );
     } on Exception catch (e) {
       throw InvalidConfigException('設定ファイルの形式が正しくありません: $e');
@@ -202,5 +200,17 @@ class VideoInfoModel {
       duration: duration,
       publishedAt: publishedAt,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'video_file_id': videoFileId,
+      'thumbnail_file_id': thumbnailFileId,
+      'duration': duration,
+      'published_at': publishedAt.toIso8601String(),
+    };
   }
 }

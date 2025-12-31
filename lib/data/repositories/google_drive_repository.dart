@@ -25,6 +25,16 @@ class GoogleDriveRepository {
     return _driveService.getFileMetadata(fileId);
   }
 
+  Future<List<Map<String, dynamic>>> listFilesInFolder(
+    String folderId, {
+    String? mimeTypeFilter,
+  }) {
+    return _driveService.listFilesInFolder(
+      folderId,
+      mimeTypeFilter: mimeTypeFilter,
+    );
+  }
+
   String extractFileId(String input) {
     return _driveService.extractFileId(input);
   }

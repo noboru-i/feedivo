@@ -93,6 +93,9 @@ class ChannelRepository {
       // Firestoreに保存
       await channelRef.set(channelModel.toFirestore());
 
+      // 動画リストを同期（videosが空の場合はmp4ファイルを自動検出）
+      await _syncVideos(userId, config.channelInfo.id, config.videos, fileId);
+
       return channelModel.toEntity();
     } on InvalidConfigException {
       rethrow;
@@ -179,6 +182,14 @@ class ChannelRepository {
 
       await _firestore.doc(channelId).update(updatedModel.toFirestore());
 
+      // 動画リストを同期（videosが空の場合はmp4ファイルを自動検出）
+      await _syncVideos(
+        channelModel.userId,
+        channelModel.id,
+        config.videos,
+        channelModel.configFileId,
+      );
+
       return updatedModel.toEntity();
     } on InvalidConfigException {
       rethrow;
@@ -186,6 +197,82 @@ class ChannelRepository {
       rethrow;
     } on Exception catch (e) {
       throw FirestoreException('チャンネルの更新に失敗しました: $e');
+    }
+  }
+
+  /// 動画リストを同期する
+  /// videosが空の場合は、設定ファイルと同じフォルダ内のmp4ファイルを自動検出
+  Future<void> _syncVideos(
+    String userId,
+    String channelId,
+    List<VideoInfoModel> videos,
+    String configFileId,
+  ) async {
+    var videoList = videos;
+
+    // videosが空の場合は、mp4ファイルを自動検出
+    if (videoList.isEmpty) {
+      videoList = await _autoDetectMp4Files(configFileId);
+    }
+
+    // VideoRepositoryを使用して動画を同期
+    await _videoRepo.syncVideosFromConfig(
+      channelId,
+      videoList.map((v) => v.toJson()).toList(),
+    );
+  }
+
+  /// 設定ファイルと同じフォルダ内のmp4ファイルを自動検出
+  Future<List<VideoInfoModel>> _autoDetectMp4Files(String configFileId) async {
+    try {
+      // 設定ファイルのメタデータを取得して親フォルダIDを取得
+      final metadata = await _driveRepo.getFileMetadata(configFileId);
+      final parents = metadata['parents'] as List<dynamic>?;
+
+      if (parents == null || parents.isEmpty) {
+        // 親フォルダがない場合は空リストを返す
+        return [];
+      }
+
+      final folderId = parents.first as String;
+
+      // フォルダ内のmp4ファイル一覧を取得
+      final files = await _driveRepo.listFilesInFolder(
+        folderId,
+        mimeTypeFilter: 'video/mp4',
+      );
+
+      // 各mp4ファイルから動画情報を生成
+      final videos = <VideoInfoModel>[];
+      for (final file in files) {
+        final fileId = file['id'] as String;
+        final fileName = file['name'] as String;
+        final createdTime = file['createdTime'] as String?;
+        final modifiedTime = file['modifiedTime'] as String?;
+
+        // ファイル名から拡張子を除去してタイトルを生成
+        final title = fileName.replaceAll(RegExp(r'\.mp4$'), '');
+
+        videos.add(
+          VideoInfoModel(
+            id: fileId,
+            title: title,
+            description: fileName,
+            videoFileId: fileId,
+            duration: 0, // durationは再生時に取得される
+            publishedAt: createdTime != null
+                ? DateTime.parse(createdTime)
+                : (modifiedTime != null
+                    ? DateTime.parse(modifiedTime)
+                    : DateTime.now()),
+          ),
+        );
+      }
+
+      return videos;
+    } on Exception {
+      // エラーが発生した場合は空リストを返す
+      return [];
     }
   }
 }
