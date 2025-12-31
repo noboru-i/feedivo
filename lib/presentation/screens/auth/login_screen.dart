@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../core/analytics/analytics_service.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/google_sign_in_button_web.dart';
 
 /// ログイン画面
 /// Google Sign-inでの認証を行う
@@ -103,6 +105,12 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildGoogleSignInButton(BuildContext context) {
+    if (kIsWeb) {
+      // Web版: GoogleのSDKが提供するボタンを使用
+      return const GoogleSignInButtonWeb();
+    }
+
+    // モバイル版: カスタムボタン
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         return ElevatedButton(

@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../data/repositories/auth_repository.dart';
 import '../../domain/entities/user.dart';
@@ -31,6 +33,44 @@ class AuthProvider extends ChangeNotifier {
       _currentUser = user;
       notifyListeners();
     });
+
+    // Web版: Google Sign-in authenticationEventsを監視
+    if (kIsWeb) {
+      GoogleSignIn.instance.authenticationEvents.listen((event) async {
+        try {
+          final googleUser = switch (event) {
+            GoogleSignInAuthenticationEventSignIn() => event.user,
+            _ => null,
+          };
+
+          if (googleUser != null) {
+            // Google認証情報を取得 (v7.xでは同期的)
+            final googleAuth = googleUser.authentication;
+
+            // Firebase認証クレデンシャルを作成
+            // Web版ではaccessTokenがないため、idTokenのみを使用
+            final credential = firebase_auth.GoogleAuthProvider.credential(
+              idToken: googleAuth.idToken,
+            );
+
+            // Firebaseにサインイン
+            final userCredential = await firebase_auth.FirebaseAuth.instance
+                .signInWithCredential(credential);
+
+            // ユーザー情報を処理
+            final user = await _authRepository.handleWebAuthentication(
+              userCredential,
+            );
+
+            _currentUser = user;
+            notifyListeners();
+          }
+        } on Exception catch (e) {
+          _errorMessage = 'Web認証に失敗しました: $e';
+          notifyListeners();
+        }
+      });
+    }
   }
 
   /// Googleアカウントでサインイン

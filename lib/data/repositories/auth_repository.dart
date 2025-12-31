@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../config/constants.dart';
@@ -33,7 +34,16 @@ class AuthRepository {
 
   Future<User?> signInWithGoogle() async {
     try {
-      // Google Sign-in フロー (v7.x)
+      if (kIsWeb) {
+        // Web版: renderButton()を使用してサインイン
+        // authenticationEventsをリッスンする必要がある
+        // この処理はAuthProviderで行う
+        throw UnimplementedError(
+          'Web版ではrenderButton()とauthenticationEventsを使用してください',
+        );
+      }
+
+      // モバイル版: Google Sign-in フロー (v7.x)
       final googleUser = await _googleSignIn.authenticate(
         scopeHint: AppConstants.googleScopes,
       );
@@ -73,6 +83,29 @@ class AuthRepository {
     } on Exception catch (e) {
       // エラーハンドリング
       print('Google Sign-in error: $e');
+      rethrow;
+    }
+  }
+
+  /// Web版: authenticationEventsからユーザーを処理
+  Future<User?> handleWebAuthentication(
+    firebase_auth.UserCredential userCredential,
+  ) async {
+    try {
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        return null;
+      }
+
+      // UserModelに変換
+      final userModel = UserModel.fromFirebaseUser(firebaseUser);
+
+      // Firestoreにユーザー情報を保存（初回のみ）
+      await _saveUserToFirestore(userModel);
+
+      return userModel.toEntity();
+    } on Exception catch (e) {
+      print('Web authentication handling error: $e');
       rethrow;
     }
   }
