@@ -218,78 +218,29 @@ lib/
 
 ## 🎬 チャンネル設定ファイルフォーマット
 
-配信者はGoogle Drive上に以下の形式のJSONファイルを配置します：
+配信者はGoogle Drive上にJSON形式の設定ファイルを配置します。このファイルにはチャンネル情報（ID、名前、説明、サムネイル）と動画リスト（各動画のタイトル、説明、Google Drive File ID、再生時間、公開日時）が含まれます。
 
-```json
-{
-  "version": "1.0",
-  "channel": {
-    "id": "unique_channel_id",
-    "name": "チャンネル名",
-    "description": "チャンネルの説明",
-    "thumbnail_file_id": "drive_file_id_for_thumbnail",
-    "updated_at": "2025-01-01T00:00:00Z"
-  },
-  "videos": [
-    {
-      "id": "unique_video_id",
-      "title": "動画タイトル",
-      "description": "動画の説明",
-      "video_file_id": "drive_file_id_for_video",
-      "thumbnail_file_id": "drive_file_id_for_thumbnail",
-      "duration": 1800,
-      "published_at": "2025-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
-詳細: [チャンネルセットアップガイド](docs/test_channel_setup.md)
+**詳細フォーマット**: [`docs/channel_config_format.md`](docs/channel_config_format.md)
+**セットアップ方法**: [`docs/test_channel_setup.md`](docs/test_channel_setup.md)
 
 ---
 
 ## 🔒 セキュリティ
 
 - ユーザーは自分のGoogleアカウントで認証
-- 読み取り専用スコープでGoogle Driveにアクセス
+- `drive.file` スコープでGoogle Driveにアクセス（アプリが作成したファイルのみ）
 - Firestoreセキュリティルールでユーザーごとのデータ分離
 - 動画ファイルは直接ストリーミング（サーバー保存なし）
 
-### Firestoreセキュリティルール
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null
-                         && request.auth.uid == userId;
-    }
-  }
-}
-```
+**詳細**: [`docs/firestore_schema.md`](docs/firestore_schema.md)
 
 ---
 
 ## 📊 Firestoreデータ構造
 
-```
-users/{userId}/
-  ├── channels/{channelId}/
-  │   ├── id, userId, name, description
-  │   ├── thumbnailFileId, configFileId
-  │   ├── createdAt, updatedAt, lastFetchedAt
-  │   └── videos/{videoId}/
-  │       ├── id, channelId, title, description
-  │       ├── videoFileId, thumbnailFileId
-  │       ├── duration, publishedAt
-  │       └── ...
-  └── playback_positions/{videoId}/
-      ├── videoId, channelId
-      ├── position, duration
-      ├── lastPlayedAt, isCompleted
-      └── watchPercentage
-```
+アプリのデータはFirestoreに保存され、ユーザーごとに`channels`（チャンネル）、`videos`（動画）、`playback_positions`（視聴位置）のコレクションが管理されます。認証済みユーザーは自身のデータのみアクセス可能です。
+
+**詳細**: [`docs/firestore_schema.md`](docs/firestore_schema.md)
 
 ---
 

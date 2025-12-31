@@ -157,33 +157,17 @@ Presentation層: Provider、画面、ウィジェット（UI）
 
 ---
 
-## 📊 Firestoreデータ構造
+## 📊 データ構造
 
-```
-users/{userId}/
-  ├── channels/{channelId}/
-  │   ├── id, userId, name, description
-  │   ├── thumbnailFileId, configFileId
-  │   ├── createdAt, updatedAt, lastFetchedAt
-  │   └── videos/{videoId}/
-  │       ├── id, channelId, title, description
-  │       ├── videoFileId, thumbnailFileId
-  │       ├── duration, publishedAt
-  │       └── ...
-  └── playback_positions/{videoId}/
-      ├── videoId, channelId
-      ├── position, duration
-      ├── lastPlayedAt, isCompleted
-      └── watchPercentage
-```
+### Firestoreスキーマ
+アプリのデータはすべてFirestoreに保存されます。ユーザー配下に`channels`、`videos`、`playback_positions`のコレクションが配置され、認証済みユーザーのみが自身のデータにアクセスできます。
 
-### Firestoreセキュリティルール
-```javascript
-match /users/{userId} {
-  allow read, write: if request.auth != null
-                     && request.auth.uid == userId;
-}
-```
+**詳細**: [`docs/firestore_schema.md`](docs/firestore_schema.md)
+
+### チャンネル設定ファイルフォーマット
+配信者がGoogle Drive上に配置するJSON設定ファイルの形式です。チャンネル情報と動画リストを定義します。
+
+**詳細**: [`docs/channel_config_format.md`](docs/channel_config_format.md)
 
 ---
 
