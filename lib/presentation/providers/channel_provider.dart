@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/analytics/analytics_service.dart';
 import '../../domain/entities/channel.dart';
 import '../../domain/repositories/channel_repository_interface.dart';
 
 /// チャンネル状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class ChannelProvider extends ChangeNotifier {
-  ChannelProvider(this._channelRepository);
+  ChannelProvider(this._channelRepository, this._analyticsService);
 
   final IChannelRepository _channelRepository;
+  final AnalyticsService _analyticsService;
 
   List<Channel> _channels = [];
   bool _isLoading = false;
@@ -47,6 +49,13 @@ class ChannelProvider extends ChangeNotifier {
       _channels.insert(0, channel); // 先頭に追加
       _isLoading = false;
       notifyListeners();
+
+      // Analytics: チャンネル追加
+      await _analyticsService.logChannelAdded(
+        channelId: channel.id,
+        source: 'file_id_input',
+      );
+
       return true;
     } on Exception catch (e) {
       _isLoading = false;
@@ -67,6 +76,9 @@ class ChannelProvider extends ChangeNotifier {
       _channels.removeWhere((c) => c.id == channelId);
       _isLoading = false;
       notifyListeners();
+
+      // Analytics: チャンネル削除
+      await _analyticsService.logChannelDeleted(channelId: channelId);
     } on Exception catch (e) {
       _isLoading = false;
       _errorMessage = 'チャンネルの削除に失敗しました: $e';
@@ -88,6 +100,9 @@ class ChannelProvider extends ChangeNotifier {
       }
       _isLoading = false;
       notifyListeners();
+
+      // Analytics: チャンネル更新
+      await _analyticsService.logChannelRefreshed(channelId: channelId);
     } on Exception catch (e) {
       _isLoading = false;
       _errorMessage = 'チャンネルの更新に失敗しました: $e';

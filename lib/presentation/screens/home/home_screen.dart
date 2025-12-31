@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
+import '../../../core/analytics/analytics_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
@@ -25,6 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Analytics: 画面表示
+    context.read<AnalyticsService>().logScreenView('home');
+
     // チャンネル一覧を読み込み
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadChannels();

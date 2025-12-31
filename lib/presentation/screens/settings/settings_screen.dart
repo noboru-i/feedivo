@@ -5,6 +5,7 @@ import '../../../config/constants.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../core/analytics/analytics_service.dart';
 import '../../providers/auth_provider.dart';
 
 /// 設定画面
@@ -14,6 +15,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Analytics: 画面表示
+    context.read<AnalyticsService>().logScreenView('settings');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('設定'),

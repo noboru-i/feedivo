@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../config/theme/app_colors.dart';
+import '../../../core/analytics/analytics_service.dart';
 import '../../../domain/entities/playback_position.dart';
 import '../../../domain/entities/video.dart';
 import '../../../domain/repositories/google_drive_repository_interface.dart';
@@ -40,6 +41,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Analytics: 動画再生開始と画面表示
+    context.read<AnalyticsService>()
+      ..logVideoPlayStart(
+        videoId: widget.video.id,
+        channelId: widget.video.channelId,
+        source: 'video_list',
+      )
+      ..logScreenView('video_player');
+
     _initializePlayer();
   }
 
@@ -201,6 +212,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // 90%以上再生で視聴完了マーク
       if (duration > 0 && position / duration >= 0.9) {
         await playbackProvider.markCompleted(userId, widget.video.id);
+
+        // Analytics: 動画視聴完了
+        if (mounted) {
+          await context.read<AnalyticsService>().logVideoCompleted(
+            videoId: widget.video.id,
+            watchDuration: duration,
+          );
+        }
       }
     } on Exception {
       // エラーは無視（保存失敗してもプレイヤーは続行）
@@ -222,6 +241,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       _playbackSpeed = speed;
     });
     _videoController?.setPlaybackSpeed(speed);
+
+    // Analytics: 再生速度変更
+    context.read<AnalyticsService>().logPlaybackSpeedChanged(
+      videoId: widget.video.id,
+      speed: speed,
+    );
   }
 
   @override

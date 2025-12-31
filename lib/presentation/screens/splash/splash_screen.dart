@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../core/analytics/analytics_service.dart';
 import '../../providers/auth_provider.dart';
 
 /// スプラッシュ画面
@@ -19,6 +20,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Analytics: 画面表示
+    context.read<AnalyticsService>().logScreenView('splash');
+
     _initializeApp();
   }
 

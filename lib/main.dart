@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'config/constants.dart';
 import 'config/theme/app_theme.dart';
+import 'core/analytics/analytics_service.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/channel_repository.dart';
 import 'data/repositories/google_drive_repository.dart';
@@ -80,10 +81,16 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        // Phase 3: Analytics
+        Provider<AnalyticsService>(
+          create: (_) => AnalyticsService(),
+        ),
+
         // Phase 2: Providers
         ChangeNotifierProvider(
           create: (context) => ChannelProvider(
             context.read<IChannelRepository>(),
+            context.read<AnalyticsService>(),
           ),
         ),
         ChangeNotifierProvider(
