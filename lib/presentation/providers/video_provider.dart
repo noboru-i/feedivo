@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/repositories/video_repository.dart';
 import '../../domain/entities/video.dart';
-import '../../domain/repositories/video_repository_interface.dart';
 
 /// 動画状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class VideoProvider extends ChangeNotifier {
   VideoProvider(this._videoRepository);
 
-  final IVideoRepository _videoRepository;
+  final VideoRepository _videoRepository;
 
   List<Video> _videos = [];
   bool _isLoading = false;

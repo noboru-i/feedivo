@@ -17,10 +17,6 @@ import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
 import 'domain/entities/channel.dart';
 import 'domain/entities/video.dart';
-import 'domain/repositories/channel_repository_interface.dart';
-import 'domain/repositories/google_drive_repository_interface.dart';
-import 'domain/repositories/playback_repository_interface.dart';
-import 'domain/repositories/video_repository_interface.dart';
 import 'firebase_options.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/channel_provider.dart';
@@ -72,7 +68,7 @@ class MyApp extends StatelessWidget {
         ),
 
         // Phase 2: Repositories - Base Dependencies
-        Provider<IGoogleDriveRepository>(
+        Provider<GoogleDriveRepository>(
           create: (_) => GoogleDriveRepository(
             driveService: GoogleDriveService(
               googleSignIn: GoogleSignIn.instance,
@@ -88,20 +84,20 @@ class MyApp extends StatelessWidget {
 
         // Phase 2: Repositories
         // VideoRepository must be created before ChannelRepository
-        Provider<IVideoRepository>(
+        Provider<VideoRepository>(
           create: (context) => VideoRepository(
             firestore: FirebaseFirestore.instance,
             firebaseAuth: firebase_auth.FirebaseAuth.instance,
           ),
         ),
-        Provider<IChannelRepository>(
+        Provider<ChannelRepository>(
           create: (context) => ChannelRepository(
             firestore: FirebaseFirestore.instance,
-            driveRepo: context.read<IGoogleDriveRepository>(),
-            videoRepo: context.read<IVideoRepository>(),
+            driveRepo: context.read<GoogleDriveRepository>(),
+            videoRepo: context.read<VideoRepository>(),
           ),
         ),
-        Provider<IPlaybackRepository>(
+        Provider<PlaybackRepository>(
           create: (_) => PlaybackRepository(
             firestore: FirebaseFirestore.instance,
           ),
@@ -110,18 +106,18 @@ class MyApp extends StatelessWidget {
         // Phase 2: Providers
         ChangeNotifierProvider(
           create: (context) => ChannelProvider(
-            context.read<IChannelRepository>(),
+            context.read<ChannelRepository>(),
             context.read<AnalyticsService>(),
           ),
         ),
         ChangeNotifierProvider(
           create: (context) => VideoProvider(
-            context.read<IVideoRepository>(),
+            context.read<VideoRepository>(),
           ),
         ),
         ChangeNotifierProvider(
           create: (context) => PlaybackProvider(
-            context.read<IPlaybackRepository>(),
+            context.read<PlaybackRepository>(),
           ),
         ),
       ],

@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../domain/entities/video.dart';
-import '../../domain/repositories/video_repository_interface.dart';
 import '../models/video_model.dart';
 
 /// 動画管理のリポジトリ実装
 /// Firestoreを使用して動画データを管理
-class VideoRepository implements IVideoRepository {
+class VideoRepository {
   VideoRepository({
     required FirebaseFirestore firestore,
     required firebase_auth.FirebaseAuth firebaseAuth,
@@ -26,7 +25,6 @@ class VideoRepository implements IVideoRepository {
     return userId;
   }
 
-  @override
   Future<List<Video>> getVideos(String channelId) async {
     try {
       final querySnapshot = await _firestore
@@ -46,7 +44,6 @@ class VideoRepository implements IVideoRepository {
     }
   }
 
-  @override
   Future<Video?> getVideo(String videoId) async {
     try {
       // collectionGroupを使用してvideoIdで検索
@@ -66,7 +63,6 @@ class VideoRepository implements IVideoRepository {
     }
   }
 
-  @override
   Future<void> saveVideo(Video video) async {
     try {
       final videoModel = VideoModel.fromEntity(video);
@@ -84,7 +80,6 @@ class VideoRepository implements IVideoRepository {
     }
   }
 
-  @override
   Future<void> syncVideosFromConfig(
     String channelId,
     List<dynamic> videos,
@@ -144,7 +139,6 @@ class VideoRepository implements IVideoRepository {
     }
   }
 
-  @override
   Future<void> deleteVideosByChannel(String channelId) async {
     try {
       final videos = await _firestore

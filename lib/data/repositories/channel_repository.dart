@@ -4,29 +4,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/errors/exceptions.dart';
 import '../../domain/entities/channel.dart';
-import '../../domain/repositories/channel_repository_interface.dart';
-import '../../domain/repositories/google_drive_repository_interface.dart';
-import '../../domain/repositories/video_repository_interface.dart';
 import '../models/channel_config_model.dart';
 import '../models/channel_model.dart';
+import 'google_drive_repository.dart';
+import 'video_repository.dart';
 
 /// チャンネル管理のリポジトリ実装
 /// Google DriveとFirestoreを連携してチャンネルを管理
 /// Firestoreのネイティブオフライン永続化を使用
-class ChannelRepository implements IChannelRepository {
+class ChannelRepository {
   ChannelRepository({
     required FirebaseFirestore firestore,
-    required IGoogleDriveRepository driveRepo,
-    required IVideoRepository videoRepo,
+    required GoogleDriveRepository driveRepo,
+    required VideoRepository videoRepo,
   }) : _firestore = firestore,
        _driveRepo = driveRepo,
        _videoRepo = videoRepo;
 
   final FirebaseFirestore _firestore;
-  final IGoogleDriveRepository _driveRepo;
-  final IVideoRepository _videoRepo;
+  final GoogleDriveRepository _driveRepo;
+  final VideoRepository _videoRepo;
 
-  @override
   Future<List<Channel>> getChannels(String userId) async {
     try {
       final snapshot = await _firestore
@@ -44,7 +42,6 @@ class ChannelRepository implements IChannelRepository {
     }
   }
 
-  @override
   Future<Channel?> getChannel(String channelId) async {
     try {
       // channelIdからuserIdを抽出（形式: users/{userId}/channels/{channelId}）
@@ -60,7 +57,6 @@ class ChannelRepository implements IChannelRepository {
     }
   }
 
-  @override
   Future<Channel> addChannel(String userId, String configFileId) async {
     try {
       // File IDを抽出（URLの場合）
@@ -107,7 +103,6 @@ class ChannelRepository implements IChannelRepository {
     }
   }
 
-  @override
   Future<void> deleteChannel(String channelId) async {
     try {
       // サブコレクション（videos）を削除
@@ -120,7 +115,6 @@ class ChannelRepository implements IChannelRepository {
     }
   }
 
-  @override
   Future<Channel> refreshChannel(String channelId) async {
     try {
       // 既存のチャンネル情報を取得

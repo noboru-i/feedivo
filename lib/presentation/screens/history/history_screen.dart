@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../config/theme/app_colors.dart';
+import '../../../data/repositories/video_repository.dart';
 import '../../../domain/entities/video.dart';
-import '../../../domain/repositories/video_repository_interface.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/playback_provider.dart';
 import '../../widgets/history/history_empty_state.dart';
@@ -51,7 +51,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
 
     final playbackProvider = context.read<PlaybackProvider>();
-    final videoRepository = context.read<IVideoRepository>();
+    final videoRepository = context.read<VideoRepository>();
 
     // 各視聴位置に対応する動画情報を取得
     for (final position in playbackProvider.positions.values) {

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
+
+import '../../data/repositories/auth_repository.dart';
 import '../../domain/entities/user.dart';
-import '../../domain/repositories/auth_repository_interface.dart';
 
 /// 認証状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
@@ -8,7 +9,7 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider(this._authRepository) {
     _initialize();
   }
-  final IAuthRepository _authRepository;
+  final AuthRepository _authRepository;
 
   User? _currentUser;
   bool _isLoading = false;

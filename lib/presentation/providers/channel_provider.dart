@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/analytics/analytics_service.dart';
+import '../../data/repositories/channel_repository.dart';
 import '../../domain/entities/channel.dart';
-import '../../domain/repositories/channel_repository_interface.dart';
 
 /// チャンネル状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class ChannelProvider extends ChangeNotifier {
   ChannelProvider(this._channelRepository, this._analyticsService);
 
-  final IChannelRepository _channelRepository;
+  final ChannelRepository _channelRepository;
   final AnalyticsService _analyticsService;
 
   List<Channel> _channels = [];

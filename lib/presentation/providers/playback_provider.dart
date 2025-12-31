@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/repositories/playback_repository.dart';
 import '../../domain/entities/playback_position.dart';
-import '../../domain/repositories/playback_repository_interface.dart';
 
 /// 視聴位置状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class PlaybackProvider extends ChangeNotifier {
   PlaybackProvider(this._playbackRepository);
 
-  final IPlaybackRepository _playbackRepository;
+  final PlaybackRepository _playbackRepository;
 
   final Map<String, PlaybackPosition> _positions = {};
   bool _isLoading = false;

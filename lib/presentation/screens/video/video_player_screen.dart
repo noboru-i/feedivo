@@ -8,9 +8,9 @@ import 'package:video_player/video_player.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../core/analytics/analytics_service.dart';
+import '../../../data/repositories/google_drive_repository.dart';
 import '../../../domain/entities/playback_position.dart';
 import '../../../domain/entities/video.dart';
-import '../../../domain/repositories/google_drive_repository_interface.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/playback_provider.dart';
 import '../../widgets/video/playback_speed_selector.dart';
@@ -62,7 +62,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
 
       // Google Drive APIアクセストークンを取得
-      final driveRepo = context.read<IGoogleDriveRepository>();
+      final driveRepo = context.read<GoogleDriveRepository>();
       final token = await driveRepo.getAccessToken();
 
       // ストリーミングURL構築

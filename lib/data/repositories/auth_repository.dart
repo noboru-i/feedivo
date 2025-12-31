@@ -4,12 +4,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../config/constants.dart';
 import '../../domain/entities/user.dart';
-import '../../domain/repositories/auth_repository_interface.dart';
 import '../models/user_model.dart';
 
 /// 認証リポジトリの実装
 /// Firebase AuthenticationとGoogle Sign-Inを使用
-class AuthRepository implements IAuthRepository {
+class AuthRepository {
   AuthRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
@@ -22,7 +21,6 @@ class AuthRepository implements IAuthRepository {
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
 
-  @override
   Future<User?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
     if (firebaseUser == null) {
@@ -33,7 +31,6 @@ class AuthRepository implements IAuthRepository {
     return userModel.toEntity();
   }
 
-  @override
   Future<User?> signInWithGoogle() async {
     try {
       // Google Sign-in フロー (v7.x)
@@ -80,7 +77,6 @@ class AuthRepository implements IAuthRepository {
     }
   }
 
-  @override
   Future<void> signOut() async {
     try {
       await Future.wait([
@@ -93,7 +89,6 @@ class AuthRepository implements IAuthRepository {
     }
   }
 
-  @override
   Stream<User?> authStateChanges() {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       if (firebaseUser == null) {

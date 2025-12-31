@@ -1,19 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/playback_position.dart';
-import '../../domain/repositories/playback_repository_interface.dart';
 import '../models/playback_position_model.dart';
 
 /// 視聴位置管理のリポジトリ実装
 /// Firestoreを使用して視聴位置データを管理
-class PlaybackRepository implements IPlaybackRepository {
+class PlaybackRepository {
   PlaybackRepository({
     required FirebaseFirestore firestore,
   }) : _firestore = firestore;
 
   final FirebaseFirestore _firestore;
 
-  @override
   Future<void> savePlaybackPosition(
     String userId,
     PlaybackPosition position,
@@ -32,7 +30,6 @@ class PlaybackRepository implements IPlaybackRepository {
     }
   }
 
-  @override
   Future<PlaybackPosition?> getPlaybackPosition(
     String userId,
     String videoId,
@@ -55,7 +52,6 @@ class PlaybackRepository implements IPlaybackRepository {
     }
   }
 
-  @override
   Future<void> markAsCompleted(String userId, String videoId) async {
     try {
       final positionRef = _firestore
@@ -73,7 +69,6 @@ class PlaybackRepository implements IPlaybackRepository {
     }
   }
 
-  @override
   Future<List<PlaybackPosition>> getPlaybackHistory(
     String userId, {
     int? limit,
@@ -99,7 +94,6 @@ class PlaybackRepository implements IPlaybackRepository {
     }
   }
 
-  @override
   Future<void> deletePlaybackPositionsByChannel(
     String userId,
     String channelId,
