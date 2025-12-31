@@ -167,12 +167,27 @@ match /users/{userId} {
 - セキュリティ対応：秘匿情報の.gitignore化、テンプレートファイル作成
 - ドキュメント整備：Firebase/Google Cloudセットアップガイド
 
-### Phase 2: コア機能（3-4週間）
+### Phase 2: コア機能（3-4週間）⏳ **進行中**
 **優先度**: 🔴 最高
+
+**Phase 2-1: Google Drive API基盤とドメインモデル** ✅ **完了**
+- [x] Domain層: エンティティ作成（Channel, Video, PlaybackPosition, ChannelConfig）
+- [x] Domain層: リポジトリインターフェース作成（4リポジトリ）
+- [x] Core層: カスタム例外定義
+- [x] Data層: GoogleDriveService実装
+- [x] Data層: モデルクラス作成（4モデル）
+
+**Phase 2-2: チャンネル管理機能**（次のステップ）
 - [ ] Google Drive API連携
 - [ ] チャンネル追加・管理機能
+
+**Phase 2-3: 動画リスト表示**
 - [ ] 動画リスト表示
+
+**Phase 2-4: 動画再生機能（基本）**
 - [ ] 動画再生機能（基本）
+
+**Phase 2-5: 視聴位置の保存・復元**
 - [ ] 視聴位置の保存・復元
 
 **焦点**: 視聴者機能（配信者ツールは後回し）
@@ -336,6 +351,14 @@ match /users/{userId} {
 ---
 
 ## 📝 更新履歴
+
+### 2025-12-31: Phase 2-1完了
+- ✅ Phase 2-1（Google Drive API基盤とドメインモデル）を完了
+- Domain層: エンティティ4つ、リポジトリインターフェース4つを作成
+- Core層: カスタム例外定義（8種類のエラー型）
+- Data層: GoogleDriveService、モデルクラス4つを実装
+- JSONベースのチャンネル設定ファイルスキーマを設計
+- pedantic_mono準拠（Lint & Format）
 
 ### 2025-12-31: Phase 1完了
 - ✅ Phase 1（基盤構築）を完了としてマーク
