@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_dimensions.dart';
@@ -106,4 +107,135 @@ class ChannelCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// Widget Previews
+
+Channel createSampleChannel({
+  required String id,
+  required String name,
+  required String description,
+}) {
+  final now = DateTime.now();
+  return Channel(
+    id: id,
+    userId: 'preview-user',
+    name: name,
+    description: description,
+    configFileId: 'preview-config-file-id',
+    createdAt: now,
+    updatedAt: now,
+  );
+}
+
+@Preview(
+  group: 'ChannelCard',
+  name: 'Light - Purple Gradient',
+  brightness: Brightness.light,
+)
+Widget channelCardLightPurple() {
+  return MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: ChannelCard(
+          channel: createSampleChannel(
+            id: 'channel-1',
+            name: 'テクノロジーチャンネル',
+            description: '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
+          ),
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ChannelCard',
+  name: 'Dark - Purple Gradient',
+  brightness: Brightness.dark,
+)
+Widget channelCardDarkPurple() {
+  return MaterialApp(
+    theme: ThemeData.dark(),
+    home: Scaffold(
+      body: Center(
+        child: ChannelCard(
+          channel: createSampleChannel(
+            id: 'channel-1',
+            name: 'テクノロジーチャンネル',
+            description: '最新のテクノロジーニュースや解説動画を配信しています。プログラミング、AI、クラウドなど幅広いトピックを扱います。',
+          ),
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ChannelCard',
+  name: 'Pink Gradient',
+  brightness: Brightness.light,
+)
+Widget channelCardPink() {
+  return MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: ChannelCard(
+          channel: createSampleChannel(
+            id: 'channel-2',
+            name: '料理チャンネル',
+            description: '簡単で美味しいレシピを紹介します。',
+          ),
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ChannelCard',
+  name: 'Blue Gradient',
+  brightness: Brightness.light,
+)
+Widget channelCardBlue() {
+  return MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: ChannelCard(
+          channel: createSampleChannel(
+            id: 'channel-3',
+            name: '旅行チャンネル',
+            description: '世界中の素敵な場所を紹介します。',
+          ),
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
+}
+
+@Preview(
+  group: 'ChannelCard',
+  name: 'Long Text Overflow',
+  brightness: Brightness.light,
+)
+Widget channelCardLongText() {
+  return MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: ChannelCard(
+          channel: createSampleChannel(
+            id: 'channel-4',
+            name: 'とても長いチャンネル名がここに表示されますがオーバーフローで省略されます',
+            description:
+                'とても長い説明文がここに表示されます。この説明文は2行以上になる可能性がありますが、最大2行までしか表示されずに省略記号が表示されるはずです。',
+          ),
+          onTap: () {},
+        ),
+      ),
+    ),
+  );
 }
