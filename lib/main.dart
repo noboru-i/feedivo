@@ -83,17 +83,19 @@ class MyApp extends StatelessWidget {
         ),
 
         // Phase 2: Repositories - Dependent on Cache
+        // VideoRepository must be created before ChannelRepository
+        Provider<IVideoRepository>(
+          create: (context) => VideoRepository(
+            firestore: FirebaseFirestore.instance,
+            cacheRepo: context.read<IVideoCacheRepository>(),
+          ),
+        ),
         Provider<IChannelRepository>(
           create: (context) => ChannelRepository(
             firestore: FirebaseFirestore.instance,
             driveRepo: context.read<IGoogleDriveRepository>(),
             cacheRepo: context.read<IChannelCacheRepository>(),
-          ),
-        ),
-        Provider<IVideoRepository>(
-          create: (context) => VideoRepository(
-            firestore: FirebaseFirestore.instance,
-            cacheRepo: context.read<IVideoCacheRepository>(),
+            videoRepo: context.read<IVideoRepository>(),
           ),
         ),
         Provider<IPlaybackRepository>(

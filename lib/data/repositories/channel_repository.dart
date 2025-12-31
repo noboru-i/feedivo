@@ -7,6 +7,7 @@ import '../../domain/entities/channel.dart';
 import '../../domain/repositories/channel_cache_repository_interface.dart';
 import '../../domain/repositories/channel_repository_interface.dart';
 import '../../domain/repositories/google_drive_repository_interface.dart';
+import '../../domain/repositories/video_repository_interface.dart';
 import '../models/channel_config_model.dart';
 import '../models/channel_model.dart';
 
@@ -18,13 +19,16 @@ class ChannelRepository implements IChannelRepository {
     required FirebaseFirestore firestore,
     required IGoogleDriveRepository driveRepo,
     required IChannelCacheRepository cacheRepo,
+    required IVideoRepository videoRepo,
   }) : _firestore = firestore,
        _driveRepo = driveRepo,
-       _cacheRepo = cacheRepo;
+       _cacheRepo = cacheRepo,
+       _videoRepo = videoRepo;
 
   final FirebaseFirestore _firestore;
   final IGoogleDriveRepository _driveRepo;
   final IChannelCacheRepository _cacheRepo;
+  final IVideoRepository _videoRepo;
 
   @override
   Future<List<Channel>> getChannels(String userId) async {
@@ -130,13 +134,14 @@ class ChannelRepository implements IChannelRepository {
   @override
   Future<void> deleteChannel(String channelId) async {
     try {
+      // サブコレクション（videos）を削除
+      await _videoRepo.deleteVideosByChannel(channelId);
+
+      // チャンネルドキュメントを削除
       await _firestore.doc(channelId).delete();
 
       // キャッシュから削除
       await _cacheRepo.deleteChannel(channelId);
-
-      // TODO: サブコレクション（videos）の削除も必要
-      // Phase 2-3で実装予定
     } on Exception catch (e) {
       throw FirestoreException('チャンネルの削除に失敗しました: $e');
     }
