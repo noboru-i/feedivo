@@ -10,7 +10,7 @@ class AppConstants {
   // Google OAuth スコープ
   static const List<String> googleScopes = [
     'email',
-    'https://www.googleapis.com/auth/drive.readonly',
+    'https://www.googleapis.com/auth/drive.file',
   ];
 
   // Firestoreコレクション名

@@ -27,7 +27,7 @@ class GoogleDriveService {
 
       // Google Driveのscopesに対する認可を取得
       final authorization = await authClient.authorizationForScopes([
-        'https://www.googleapis.com/auth/drive.readonly',
+        'https://www.googleapis.com/auth/drive.file',
       ]);
 
       final accessToken = authorization?.accessToken;
