@@ -7,7 +7,11 @@
         {
             "name": "feedivo",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--web-port",
+                "8080"
+            ]
         },
         {
             "name": "feedivo (profile mode)",
