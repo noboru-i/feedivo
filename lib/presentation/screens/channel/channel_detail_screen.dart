@@ -51,6 +51,95 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     await videoProvider.loadVideos(widget.channel.id);
   }
 
+  Future<void> _handleRefresh() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    try {
+      await _refreshChannel();
+
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('チャンネル設定を更新しました'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('更新に失敗しました: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleDelete() async {
+    // 削除確認ダイアログを表示
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('チャンネルを削除'),
+        content: Text(
+          'チャンネル「${widget.channel.name}」を削除してもよろしいですか？\n\n'
+          'このチャンネルの動画データと視聴履歴も削除されます。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.errorColor,
+            ),
+            child: const Text('削除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    // チャンネルを削除
+    final channelProvider = context.read<ChannelProvider>();
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    try {
+      await channelProvider.deleteChannel(widget.channel.id);
+
+      if (mounted) {
+        // 画面を閉じる
+        navigator.pop();
+
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('チャンネルを削除しました'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('削除に失敗しました: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,6 +147,20 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
         title: Text(widget.channel.name),
         backgroundColor: AppColors.primaryColor,
         foregroundColor: AppColors.onPrimary,
+        actions: [
+          // JSON再読み込みボタン
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'チャンネル設定を再読み込み',
+            onPressed: _handleRefresh,
+          ),
+          // チャンネル削除ボタン
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: 'チャンネルを削除',
+            onPressed: _handleDelete,
+          ),
+        ],
       ),
       body: _buildBody(),
     );
