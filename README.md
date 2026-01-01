@@ -254,11 +254,36 @@ lib/
 
 ---
 
+## 🔄 CI/CD（継続的インテグレーション/デリバリー）
+
+GitHub Actionsを使用して、Android、iOS、Webの自動ビルドとデプロイが可能です。
+
+### サポートプラットフォーム
+- **Android**: Google Play Store（内部テストトラック）への自動デプロイ
+- **iOS**: TestFlightへの自動デプロイ
+- **Web**: Firebase HostingまたはGitHub Pagesへの自動デプロイ
+
+### ワークフロー
+- `.github/workflows/android.yml` - Androidビルド＆デプロイ
+- `.github/workflows/ios.yml` - iOSビルド＆デプロイ
+- `.github/workflows/web.yml` - Webビルド＆デプロイ
+
+### セットアップ
+1. 必要なGitHub Secretsを設定（Firebase設定、署名証明書など）
+2. ワークフローは`main`または`develop`ブランチへのプッシュで自動実行
+3. 手動実行も可能（GitHub Actionsタブから）
+
+**詳細**: [GitHub Actions セットアップガイド](docs/setup/github-actions-setup.md)  
+**クイックスタート**: [.github/QUICK_START.md](.github/QUICK_START.md)
+
+---
+
 ## 📚 ドキュメント
 
 ### セットアップガイド
 - [Firebase & Google Cloud セットアップ](docs/setup/firebase-google-cloud-setup.md)
 - [ローカル開発環境セットアップ](docs/setup/local-setup-instructions.md)
+- [GitHub Actions CI/CD セットアップ](docs/setup/github-actions-setup.md)
 - [テスト用チャンネルセットアップ](docs/test_channel_setup.md)
 
 ### 開発ガイド
