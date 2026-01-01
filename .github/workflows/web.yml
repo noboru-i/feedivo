@@ -49,11 +49,12 @@ jobs:
           # Parse configuration and create index.html from template
           if [ -f web/index.html.template ]; then
             # Replace placeholder values with actual configuration
-            # This assumes WEB_CONFIG_JSON contains Firebase web config
+            # This assumes WEB_CONFIG_JSON contains Firebase config
             cp web/index.html.template web/index.html
-            
+
             # If you have specific replacements needed, add them here
-            # For example: sed -i 's/__FIREBASE_API_KEY__/$API_KEY/g' web/index.html
+            # For example:
+            # sed -i 's/__FIREBASE_API_KEY__/$API_KEY/g' web/index.html
           fi
 
       - name: Build web app
@@ -116,11 +117,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      id-token: write   # to verify the deployment originates
+                        # from an appropriate source
 
     environment:
       name: github-pages
