@@ -42,10 +42,14 @@ class ChannelRepository {
     }
   }
 
-  Future<Channel?> getChannel(String channelId) async {
+  Future<Channel?> getChannel(String userId, String channelId) async {
     try {
-      // channelIdからuserIdを抽出（形式: users/{userId}/channels/{channelId}）
-      final doc = await _firestore.doc(channelId).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('channels')
+          .doc(channelId)
+          .get();
 
       if (!doc.exists) {
         return null;
@@ -106,22 +110,32 @@ class ChannelRepository {
     }
   }
 
-  Future<void> deleteChannel(String channelId) async {
+  Future<void> deleteChannel(String userId, String channelId) async {
     try {
       // サブコレクション（videos）を削除
       await _videoRepo.deleteVideosByChannel(channelId);
 
       // チャンネルドキュメントを削除
-      await _firestore.doc(channelId).delete();
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('channels')
+          .doc(channelId)
+          .delete();
     } on Exception catch (e) {
       throw FirestoreException('チャンネルの削除に失敗しました: $e');
     }
   }
 
-  Future<Channel> refreshChannel(String channelId) async {
+  Future<Channel> refreshChannel(String userId, String channelId) async {
     try {
       // 既存のチャンネル情報を取得
-      final channelDoc = await _firestore.doc(channelId).get();
+      final channelDoc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('channels')
+          .doc(channelId)
+          .get();
 
       if (!channelDoc.exists) {
         throw FirestoreException('チャンネルが見つかりません');
@@ -158,9 +172,14 @@ class ChannelRepository {
           lastFetchedAt: DateTime.now(),
         );
 
-        await _firestore.doc(channelId).update({
-          'lastFetchedAt': Timestamp.fromDate(updatedModel.lastFetchedAt!),
-        });
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('channels')
+            .doc(channelId)
+            .update({
+              'lastFetchedAt': Timestamp.fromDate(updatedModel.lastFetchedAt!),
+            });
 
         return updatedModel.toEntity();
       }
@@ -180,7 +199,12 @@ class ChannelRepository {
         lastFetchedAt: now,
       );
 
-      await _firestore.doc(channelId).update(updatedModel.toFirestore());
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('channels')
+          .doc(channelId)
+          .update(updatedModel.toFirestore());
 
       // 動画リストを同期（videosが空の場合はmp4ファイルを自動検出）
       await _syncVideos(
@@ -263,8 +287,8 @@ class ChannelRepository {
             publishedAt: createdTime != null
                 ? DateTime.parse(createdTime)
                 : (modifiedTime != null
-                    ? DateTime.parse(modifiedTime)
-                    : DateTime.now()),
+                      ? DateTime.parse(modifiedTime)
+                      : DateTime.now()),
           ),
         );
       }

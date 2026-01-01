@@ -72,7 +72,9 @@ class ChannelProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _channelRepository.deleteChannel(channelId);
+      // チャンネルからuserIdを取得
+      final channel = _channels.firstWhere((c) => c.id == channelId);
+      await _channelRepository.deleteChannel(channel.userId, channelId);
       _channels.removeWhere((c) => c.id == channelId);
       _isLoading = false;
       notifyListeners();
@@ -93,7 +95,12 @@ class ChannelProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedChannel = await _channelRepository.refreshChannel(channelId);
+      // チャンネルからuserIdを取得
+      final channel = _channels.firstWhere((c) => c.id == channelId);
+      final updatedChannel = await _channelRepository.refreshChannel(
+        channel.userId,
+        channelId,
+      );
       final index = _channels.indexWhere((c) => c.id == channelId);
       if (index != -1) {
         _channels[index] = updatedChannel;
