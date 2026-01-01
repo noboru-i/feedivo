@@ -10,31 +10,37 @@ DO NOT commit actual secret values to this file.
 3. Click "New repository secret"
 4. Add each secret below with its corresponding value
 
+# GitHub Secrets Template
+
+This file serves as a checklist for setting up GitHub Secrets for CI/CD workflows.
+DO NOT commit actual secret values to this file.
+
+## Setup Instructions
+
+1. Go to your GitHub repository
+2. Navigate to Settings → Secrets and variables → Actions
+3. Click "New repository secret"
+4. Add each secret below with its corresponding value
+
 ## Common Secrets (Required for all platforms)
 
-- [ ] `FIREBASE_OPTIONS_DART`
-  - Description: Content of lib/firebase_options.dart
-  - How to get: Copy the entire content of lib/firebase_options.dart
-  - Format: Plain text (no encoding)
+- [ ] `FIREBASE_PROJECT_ID`
+  - Description: Firebase project ID
+  - How to get: Firebase Console → Project Settings → General
+  - Format: Plain text (e.g., my-project-12345)
+
+**Note**: Firebase configuration files (`firebase_options.dart`, `google-services.json`, `GoogleService-Info.plist`) are now automatically generated using `flutterfire configure` during the CI/CD build process. You no longer need to manually set these as secrets.
 
 ## Android Secrets
 
-- [ ] `GOOGLE_SERVICES_JSON`
-  - Description: Google Services configuration for Android
-  - How to get: Copy content of android/app/google-services.json
-  - Format: Plain text JSON (no encoding)
+### Android Deployment (Required only for deployment)
 
-- [ ] `PLAY_STORE_SERVICE_ACCOUNT` (Required only for deployment)
+- [ ] `PLAY_STORE_SERVICE_ACCOUNT`
   - Description: Service account for Google Play Console
   - How to get: Google Play Console → Settings → API Access → Create Service Account
   - Format: Plain text JSON (no encoding)
 
 ## iOS Secrets
-
-- [ ] `GOOGLE_SERVICE_INFO_PLIST`
-  - Description: Google Services configuration for iOS
-  - How to get: Copy content of ios/Runner/GoogleService-Info.plist
-  - Format: Plain text XML (no encoding)
 
 ### iOS Code Signing (Required only for deployment)
 
@@ -77,31 +83,21 @@ DO NOT commit actual secret values to this file.
 
 ## Web Secrets
 
-### Firebase Hosting Deployment
+## Web Secrets
+
+### Firebase Hosting Deployment (Required only for deployment)
 
 - [ ] `FIREBASE_SERVICE_ACCOUNT`
   - Description: Service account for Firebase Hosting deployment
   - How to get: Firebase Console → Project Settings → Service Accounts → Generate New Private Key
   - Format: Plain text JSON (no encoding)
 
-- [ ] `FIREBASE_PROJECT_ID`
-  - Description: Firebase project ID
-  - How to get: Firebase Console → Project Settings → General
-  - Format: Plain text (e.g., my-project-12345)
-
-### Optional Web Configuration
-
-- [ ] `WEB_CONFIG_JSON`
-  - Description: Firebase configuration for web (optional)
-  - How to get: Firebase Console → Project Settings → General → Your apps → Web app → Config
-  - Format: Plain text JSON
-
 ## Verification Checklist
 
 After setting up all required secrets:
 
-- [ ] All common secrets are set
-- [ ] Platform-specific secrets are set (at least for one platform)
+- [ ] `FIREBASE_PROJECT_ID` is set (required for all platforms)
+- [ ] Platform-specific deployment secrets are set (if deploying)
 - [ ] Workflow files are present in `.github/workflows/`
 - [ ] Test workflow runs successfully
 - [ ] Build artifacts are generated correctly

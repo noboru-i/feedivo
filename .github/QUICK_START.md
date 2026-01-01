@@ -6,16 +6,16 @@ Set these secrets in your repository settings (**Settings** → **Secrets and va
 
 ### Common (All Platforms)
 
-- `FIREBASE_OPTIONS_DART`: Content of `lib/firebase_options.dart`
+- `FIREBASE_PROJECT_ID`: Your Firebase project ID (e.g., my-project-12345)
 
-### Android
+**Note**: Firebase configuration files are now automatically generated using `flutterfire configure`. You no longer need to manually set `FIREBASE_OPTIONS_DART`, `GOOGLE_SERVICES_JSON`, or `GOOGLE_SERVICE_INFO_PLIST`.
 
-- `GOOGLE_SERVICES_JSON`: Content of `android/app/google-services.json`
-- `PLAY_STORE_SERVICE_ACCOUNT`: Google Play Console service account JSON key (for deployment)
+### Android (Deployment only)
 
-### iOS
+- `PLAY_STORE_SERVICE_ACCOUNT`: Google Play Console service account JSON key
 
-- `GOOGLE_SERVICE_INFO_PLIST`: Content of `ios/Runner/GoogleService-Info.plist`
+### iOS (Deployment only)
+
 - `BUILD_CERTIFICATE_BASE64`: Base64-encoded .p12 certificate
 - `P12_PASSWORD`: Password for the .p12 certificate
 - `BUILD_PROVISION_PROFILE_BASE64`: Base64-encoded provisioning profile
@@ -24,11 +24,9 @@ Set these secrets in your repository settings (**Settings** → **Secrets and va
 - `APP_STORE_CONNECT_ISSUER_ID`: App Store Connect Issuer ID
 - `APP_STORE_CONNECT_API_KEY_CONTENT`: Content of .p8 API key file
 
-### Web
+### Web (Deployment only)
 
 - `FIREBASE_SERVICE_ACCOUNT`: Firebase service account JSON key (for Firebase Hosting)
-- `FIREBASE_PROJECT_ID`: Firebase project ID
-- `WEB_CONFIG_JSON`: (Optional) Web-specific Firebase configuration
 
 ## Quick Commands
 
@@ -60,8 +58,7 @@ flutter build web --release
 ## Workflow Triggers
 
 - **Push to `main`**: Build + Deploy to production
-- **Push to `develop`**: Build only
-- **Pull Request**: Build only (validation)
+- **Pull Request**: Static analysis only (validation)
 - **Manual**: Via GitHub Actions UI
 
 ## Deployment Targets
@@ -72,6 +69,7 @@ flutter build web --release
 
 ## Notes
 
-1. Update package name in `android.yml` to match your app's package name
-2. Both Firebase Hosting and GitHub Pages deployments are enabled for web by default - disable one if not needed
-3. For complete setup instructions, see `docs/setup/github-actions-setup.md`
+1. Firebase configuration files are automatically generated using `flutterfire configure`
+2. Only `FIREBASE_PROJECT_ID` is required for builds - no manual file management needed
+3. Both Firebase Hosting and GitHub Pages deployments are enabled for web by default - disable one if not needed
+4. For complete setup instructions, see `docs/setup/github-actions-setup.md`

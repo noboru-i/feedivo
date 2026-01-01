@@ -59,19 +59,18 @@ jobs:
       - name: Analyze code
         run: flutter analyze --fatal-infos
 
-      - name: Decode GoogleService-Info.plist
-        env:
-          GOOGLE_SERVICE_INFO_PLIST:
-            ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-        run: |
-          echo "$GOOGLE_SERVICE_INFO_PLIST" > \
-            ios/Runner/GoogleService-Info.plist
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
 
-      - name: Decode firebase_options.dart
+      - name: Configure Firebase
         env:
-          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         run: |
-          echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+          flutterfire configure \
+            --project=$FIREBASE_PROJECT_ID \
+            --platforms=ios \
+            --ios-bundle-id=dev.noboru.feedivo \
+            --yes
 
       - name: Install CocoaPods dependencies
         run: |

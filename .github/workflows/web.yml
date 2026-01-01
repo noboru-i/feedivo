@@ -59,26 +59,17 @@ jobs:
       - name: Analyze code
         run: flutter analyze --fatal-infos
 
-      - name: Decode firebase_options.dart
-        env:
-          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
-        run: |
-          echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
 
-      - name: Create web/index.html from template
+      - name: Configure Firebase
         env:
-          WEB_CONFIG_JSON: ${{ secrets.WEB_CONFIG_JSON }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         run: |
-          # Parse configuration and create index.html from template
-          if [ -f web/index.html.template ]; then
-            # Replace placeholder values with actual configuration
-            # This assumes WEB_CONFIG_JSON contains Firebase config
-            cp web/index.html.template web/index.html
-
-            # If you have specific replacements needed, add them here
-            # For example:
-            # sed -i 's/__FIREBASE_API_KEY__/$API_KEY/g' web/index.html
-          fi
+          flutterfire configure \
+            --project=$FIREBASE_PROJECT_ID \
+            --platforms=web \
+            --yes
 
       - name: Build web app
         run: flutter build web --release --web-renderer canvaskit
