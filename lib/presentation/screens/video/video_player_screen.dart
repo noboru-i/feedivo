@@ -145,6 +145,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   /// 視聴位置を復元
   Future<void> _restorePlaybackPosition() async {
+    if (!mounted) {
+      return;
+    }
+
     try {
       final authProvider = context.read<AuthProvider>();
       final playbackProvider = context.read<PlaybackProvider>();
@@ -168,7 +172,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   /// 定期保存タイマーを開始
   void _startSaveTimer() {
     _saveTimer?.cancel();
-    _saveTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+    _saveTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       _savePlaybackPosition();
     });
   }
@@ -176,6 +180,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   /// 視聴位置を保存
   Future<void> _savePlaybackPosition() async {
     if (_videoController == null || !_videoController!.value.isInitialized) {
+      return;
+    }
+
+    if (!mounted) {
       return;
     }
 
@@ -229,8 +237,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void dispose() {
     _saveTimer?.cancel();
-    // 最後に視聴位置を保存
-    _savePlaybackPosition();
     _videoController?.dispose();
     _chewieController?.dispose();
     super.dispose();
