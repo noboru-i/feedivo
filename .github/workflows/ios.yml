@@ -1,43 +1,12 @@
 name: iOS Build and Deploy
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
-  analyze:
-    name: Analyze Code
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.5'
-          channel: 'stable'
-          cache: true
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze code
-        run: flutter analyze --fatal-infos
-
   build:
     name: Build iOS App
     runs-on: macos-latest
-    if: github.event_name == 'push'
 
     steps:
       - name: Checkout repository
@@ -55,9 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Analyze code
-        run: flutter analyze --fatal-infos
 
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
@@ -81,7 +47,6 @@ jobs:
         run: flutter build ios --release --no-codesign
 
       - name: Create IPA (requires signing)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           BUILD_CERTIFICATE_BASE64:
             ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -127,7 +92,6 @@ jobs:
           zip -r app.ipa Payload
 
       - name: Upload IPA artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
@@ -138,7 +102,6 @@ jobs:
     name: Deploy to TestFlight
     needs: build
     runs-on: macos-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository

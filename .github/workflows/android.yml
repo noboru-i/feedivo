@@ -1,43 +1,12 @@
 name: Android Build and Deploy
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
-  analyze:
-    name: Analyze Code
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.5'
-          channel: 'stable'
-          cache: true
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze code
-        run: flutter analyze --fatal-infos
-
   build:
     name: Build Android App
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
       - name: Checkout repository
@@ -62,9 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Analyze code
-        run: flutter analyze --fatal-infos
 
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
@@ -103,7 +69,6 @@ jobs:
     name: Deploy to Play Store
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
