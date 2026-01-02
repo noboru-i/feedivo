@@ -15,17 +15,20 @@ class AuthProvider extends ChangeNotifier {
 
   User? _currentUser;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _errorMessage;
 
   // Getters
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   bool get isAuthenticated => _currentUser != null;
   String? get errorMessage => _errorMessage;
 
   /// 初期化：現在のユーザーを取得し、認証状態の変更を監視
   Future<void> _initialize() async {
     _currentUser = await _authRepository.getCurrentUser();
+    _isInitialized = true;
     notifyListeners();
 
     // 認証状態の変更を監視
@@ -134,7 +137,9 @@ class AuthProvider extends ChangeNotifier {
       debugPrint('[AuthProvider] Web版サインイン結果を処理中');
 
       // ユーザー情報を処理
-      final user = await _authRepository.handleWebAuthentication(userCredential);
+      final user = await _authRepository.handleWebAuthentication(
+        userCredential,
+      );
       _currentUser = user;
       _errorMessage = null;
 

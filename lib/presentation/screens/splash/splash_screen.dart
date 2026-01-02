@@ -29,14 +29,22 @@ class _SplashScreenState extends State<SplashScreen> {
 
   /// アプリ初期化と画面遷移
   Future<void> _initializeApp() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // AuthProviderの初期化完了を待つ
+    while (!authProvider.isInitialized) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      if (!mounted) {
+        return;
+      }
+    }
+
     // 最小表示時間（UX向上のため）
     await Future<void>.delayed(const Duration(seconds: 2));
 
     if (!mounted) {
       return;
     }
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     // 認証状態に応じて遷移
     if (authProvider.isAuthenticated) {
