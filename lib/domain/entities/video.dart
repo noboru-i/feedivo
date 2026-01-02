@@ -10,6 +10,7 @@ class Video {
     this.thumbnailFileId,
     required this.duration,
     required this.publishedAt,
+    this.lastViewedAt,
   });
   final String id;
   final String channelId;
@@ -19,6 +20,7 @@ class Video {
   final String? thumbnailFileId; // Google Drive File ID (オプション)
   final int duration; // 秒数
   final DateTime publishedAt;
+  final DateTime? lastViewedAt; // 最終視聴日時
 
   Video copyWith({
     String? id,
@@ -29,6 +31,7 @@ class Video {
     String? thumbnailFileId,
     int? duration,
     DateTime? publishedAt,
+    DateTime? lastViewedAt,
   }) {
     return Video(
       id: id ?? this.id,
@@ -39,6 +42,7 @@ class Video {
       thumbnailFileId: thumbnailFileId ?? this.thumbnailFileId,
       duration: duration ?? this.duration,
       publishedAt: publishedAt ?? this.publishedAt,
+      lastViewedAt: lastViewedAt ?? this.lastViewedAt,
     );
   }
 
@@ -56,7 +60,8 @@ class Video {
         other.videoFileId == videoFileId &&
         other.thumbnailFileId == thumbnailFileId &&
         other.duration == duration &&
-        other.publishedAt == publishedAt;
+        other.publishedAt == publishedAt &&
+        other.lastViewedAt == lastViewedAt;
   }
 
   @override
@@ -68,11 +73,12 @@ class Video {
         videoFileId.hashCode ^
         (thumbnailFileId?.hashCode ?? 0) ^
         duration.hashCode ^
-        publishedAt.hashCode;
+        publishedAt.hashCode ^
+        (lastViewedAt?.hashCode ?? 0);
   }
 
   @override
   String toString() {
-    return 'Video(id: $id, channelId: $channelId, title: $title, description: $description, videoFileId: $videoFileId, thumbnailFileId: $thumbnailFileId, duration: $duration, publishedAt: $publishedAt)';
+    return 'Video(id: $id, channelId: $channelId, title: $title, description: $description, videoFileId: $videoFileId, thumbnailFileId: $thumbnailFileId, duration: $duration, publishedAt: $publishedAt, lastViewedAt: $lastViewedAt)';
   }
 }

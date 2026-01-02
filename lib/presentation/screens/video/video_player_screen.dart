@@ -9,6 +9,7 @@ import 'package:video_player/video_player.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../core/analytics/analytics_service.dart';
 import '../../../data/repositories/google_drive_repository.dart';
+import '../../../data/repositories/video_repository.dart';
 import '../../../domain/entities/playback_position.dart';
 import '../../../domain/entities/video.dart';
 import '../../providers/auth_provider.dart';
@@ -130,6 +131,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _isLoading = false;
       });
 
+      // 動画詳細画面への遷移時に視聴情報を記録
+      await _recordViewStart();
+
       // 視聴位置を復元
       await _restorePlaybackPosition();
 
@@ -140,6 +144,28 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _isLoading = false;
         _errorMessage = '動画の読み込みに失敗しました: $e';
       });
+    }
+  }
+
+  /// 動画詳細画面への遷移時に視聴開始情報を記録
+  Future<void> _recordViewStart() async {
+    if (!mounted || _videoController == null || !_videoController!.value.isInitialized) {
+      return;
+    }
+
+    try {
+      // 実際の動画のdurationを取得
+      final actualDuration = _videoController!.value.duration.inSeconds;
+
+      // videosコレクションの視聴情報を更新
+      final videoRepo = context.read<VideoRepository>();
+      await videoRepo.updateViewInfo(
+        widget.video.channelId,
+        widget.video.id,
+        actualDuration,
+      );
+    } on Exception {
+      // エラーは無視（保存失敗してもプレイヤーは続行）
     }
   }
 

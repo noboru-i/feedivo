@@ -24,7 +24,8 @@ users/{userId}/
   │       ├── videoFileId: String
   │       ├── thumbnailFileId: String?
   │       ├── duration: Integer
-  │       └── publishedAt: Timestamp
+  │       ├── publishedAt: Timestamp
+  │       └── lastViewedAt: Timestamp?
   └── playback_positions/{videoId}/
       ├── videoId: String
       ├── channelId: String
@@ -65,8 +66,9 @@ users/{userId}/
 | `description` | String | 動画の説明 |
 | `videoFileId` | String | 動画ファイルのGoogle Drive File ID |
 | `thumbnailFileId` | String? | サムネイル画像のGoogle Drive File ID |
-| `duration` | Integer | 動画の長さ（秒） |
+| `duration` | Integer | 動画の長さ（秒）- 実際の動画ファイルから取得した値で更新される |
 | `publishedAt` | Timestamp | 公開日時 |
+| `lastViewedAt` | Timestamp? | 最終視聴日時 |
 
 ### playback_positions/{videoId}
 

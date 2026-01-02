@@ -14,6 +14,7 @@ class VideoModel {
     this.thumbnailFileId,
     required this.duration,
     required this.publishedAt,
+    this.lastViewedAt,
   });
 
   /// FirestoreのDocumentSnapshotからモデルを生成
@@ -29,6 +30,9 @@ class VideoModel {
       thumbnailFileId: data['thumbnailFileId'] as String?,
       duration: data['duration'] as int,
       publishedAt: (data['publishedAt'] as Timestamp).toDate(),
+      lastViewedAt: data['lastViewedAt'] != null
+          ? (data['lastViewedAt'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -43,6 +47,7 @@ class VideoModel {
       thumbnailFileId: video.thumbnailFileId,
       duration: video.duration,
       publishedAt: video.publishedAt,
+      lastViewedAt: video.lastViewedAt,
     );
   }
 
@@ -54,6 +59,7 @@ class VideoModel {
   final String? thumbnailFileId;
   final int duration;
   final DateTime publishedAt;
+  final DateTime? lastViewedAt;
 
   /// Firestoreに保存する形式に変換
   Map<String, dynamic> toFirestore() {
@@ -65,6 +71,8 @@ class VideoModel {
       'thumbnailFileId': thumbnailFileId,
       'duration': duration,
       'publishedAt': Timestamp.fromDate(publishedAt),
+      'lastViewedAt':
+          lastViewedAt != null ? Timestamp.fromDate(lastViewedAt!) : null,
     };
   }
 
@@ -79,6 +87,7 @@ class VideoModel {
       thumbnailFileId: thumbnailFileId,
       duration: duration,
       publishedAt: publishedAt,
+      lastViewedAt: lastViewedAt,
     );
   }
 }

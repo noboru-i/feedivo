@@ -156,4 +156,28 @@ class VideoRepository {
       rethrow;
     }
   }
+
+  /// 動画の視聴情報を更新
+  Future<void> updateViewInfo(
+    String channelId,
+    String videoId,
+    int duration,
+  ) async {
+    try {
+      final videoRef = _firestore
+          .collection('users')
+          .doc(_currentUserId)
+          .collection('channels')
+          .doc(channelId)
+          .collection('videos')
+          .doc(videoId);
+
+      await videoRef.update({
+        'lastViewedAt': FieldValue.serverTimestamp(),
+        'duration': duration,
+      });
+    } on Exception {
+      rethrow;
+    }
+  }
 }
