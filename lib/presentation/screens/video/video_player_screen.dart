@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/chewie.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -66,15 +67,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       final token = await driveRepo.getAccessToken();
 
       // ストリーミングURL構築
-      final videoUrl =
-          'https://www.googleapis.com/drive/v3/files/${widget.video.videoFileId}?alt=media';
+      // Web版: <video>タグはAuthorizationヘッダーを送信できないため、
+      // URLにアクセストークンをクエリパラメータとして追加
+      // モバイル版: セキュリティのためAuthorizationヘッダーを使用
+      final videoUrl = kIsWeb
+          ? 'https://www.googleapis.com/drive/v3/files/${widget.video.videoFileId}?alt=media&access_token=$token'
+          : 'https://www.googleapis.com/drive/v3/files/${widget.video.videoFileId}?alt=media';
 
       // VideoPlayerController初期化
       _videoController = VideoPlayerController.networkUrl(
         Uri.parse(videoUrl),
-        httpHeaders: {
-          'Authorization': 'Bearer $token',
-        },
+        httpHeaders: kIsWeb
+            ? {} // Web版ではヘッダーを使用しない
+            : {
+                'Authorization': 'Bearer $token',
+              },
       );
 
       await _videoController!.initialize();
