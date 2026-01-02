@@ -125,4 +125,25 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  /// Web版: signInWithPopupの結果を処理
+  Future<void> handleWebSignInResult(
+    firebase_auth.UserCredential userCredential,
+  ) async {
+    try {
+      debugPrint('[AuthProvider] Web版サインイン結果を処理中');
+
+      // ユーザー情報を処理
+      final user = await _authRepository.handleWebAuthentication(userCredential);
+      _currentUser = user;
+      _errorMessage = null;
+
+      debugPrint('[AuthProvider] Web版サインイン成功: ${user?.displayName}');
+      notifyListeners();
+    } on Exception catch (e) {
+      debugPrint('[AuthProvider] Web版サインイン処理エラー: $e');
+      _errorMessage = 'ログイン処理に失敗しました: $e';
+      notifyListeners();
+    }
+  }
 }

@@ -179,6 +179,12 @@ Presentation層: Provider、画面、ウィジェット（UI）
 - 1日あたり1,000,000リクエスト
 - レート制限への対応が必要
 
+#### Google Drive API スコープ
+- 現在のスコープ: `drive.readonly`（読み取り専用）
+- 変更履歴: `drive.file`から`drive.readonly`に変更（セキュリティ向上のため）
+- 既存ユーザーへの影響: スコープ変更後は再ログインが必要
+- エラーハンドリング: `GoogleDriveService`と`ChannelProvider`で適切なエラーメッセージを表示
+
 #### Web版の制約
 - バックグラウンド再生の制限
 - プッシュ通知非対応

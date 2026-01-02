@@ -22,6 +22,9 @@ class AuthRepository {
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
 
+  // Web版で取得したアクセストークンを保存
+  String? _webAccessToken;
+
   Future<User?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
     if (firebaseUser == null) {
@@ -97,6 +100,13 @@ class AuthRepository {
         return null;
       }
 
+      // OAuthCredentialからアクセストークンを取得（Web版のみ）
+      if (kIsWeb && userCredential.credential is firebase_auth.OAuthCredential) {
+        final oauthCredential = userCredential.credential! as firebase_auth.OAuthCredential;
+        _webAccessToken = oauthCredential.accessToken;
+        print('[AuthRepository] Web版アクセストークン保存: ${_webAccessToken != null}');
+      }
+
       // UserModelに変換
       final userModel = UserModel.fromFirebaseUser(firebaseUser);
 
@@ -108,6 +118,14 @@ class AuthRepository {
       print('Web authentication handling error: $e');
       rethrow;
     }
+  }
+
+  /// Web版: 保存されたアクセストークンを取得
+  String? getWebAccessToken() {
+    if (!kIsWeb) {
+      return null;
+    }
+    return _webAccessToken;
   }
 
   Future<void> signOut() async {

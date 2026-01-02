@@ -60,21 +60,30 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Phase 1: AuthRepository (他のProviderより先に作成)
+        Provider<AuthRepository>(
+          create: (_) => AuthRepository(),
+        ),
+
         // Phase 1: AuthProvider
         ChangeNotifierProvider(
-          create: (_) => AuthProvider(
-            AuthRepository(),
+          create: (context) => AuthProvider(
+            context.read<AuthRepository>(),
           ),
         ),
 
         // Phase 2: Repositories - Base Dependencies
         Provider<GoogleDriveRepository>(
-          create: (_) => GoogleDriveRepository(
-            driveService: GoogleDriveService(
-              googleSignIn: GoogleSignIn.instance,
-              httpClient: http.Client(),
-            ),
-          ),
+          create: (context) {
+            final authRepo = context.read<AuthRepository>();
+            return GoogleDriveRepository(
+              driveService: GoogleDriveService(
+                googleSignIn: GoogleSignIn.instance,
+                httpClient: http.Client(),
+                webAccessTokenProvider: authRepo.getWebAccessToken,
+              ),
+            );
+          },
         ),
 
         // Phase 3: Analytics
