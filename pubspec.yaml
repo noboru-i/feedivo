@@ -26,10 +26,12 @@ dependencies:
   googleapis: ^15.0.0
   googleapis_auth: ^2.0.0
   http: ^1.2.0
+  idb_shim: ^2.4.1+1
   intl: ^0.19.0
   just_audio: ^0.9.0
   provider: ^6.1.5+1
   video_player: ^2.9.2
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:

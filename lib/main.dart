@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -13,8 +14,10 @@ import 'data/repositories/auth_repository.dart';
 import 'data/repositories/channel_repository.dart';
 import 'data/repositories/google_drive_repository.dart';
 import 'data/repositories/playback_repository.dart';
+import 'data/repositories/video_cache_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
+import 'data/services/video_cache_service_web.dart';
 import 'domain/entities/channel.dart';
 import 'domain/entities/video.dart';
 import 'firebase_options.dart';
@@ -73,15 +76,34 @@ class MyApp extends StatelessWidget {
         ),
 
         // Phase 2: Repositories - Base Dependencies
-        Provider<GoogleDriveRepository>(
+        // GoogleDriveService（VideoCacheRepositoryでも使用するため、先に作成）
+        Provider<GoogleDriveService>(
           create: (context) {
             final authRepo = context.read<AuthRepository>();
+            return GoogleDriveService(
+              googleSignIn: GoogleSignIn.instance,
+              httpClient: http.Client(),
+              webAccessTokenProvider: authRepo.getWebAccessToken,
+            );
+          },
+        ),
+
+        Provider<GoogleDriveRepository>(
+          create: (context) {
+            final driveService = context.read<GoogleDriveService>();
             return GoogleDriveRepository(
-              driveService: GoogleDriveService(
-                googleSignIn: GoogleSignIn.instance,
-                httpClient: http.Client(),
-                webAccessTokenProvider: authRepo.getWebAccessToken,
-              ),
+              driveService: driveService,
+            );
+          },
+        ),
+
+        // VideoCacheRepository（Web版のみ動画キャッシュ機能を使用）
+        Provider<VideoCacheRepository>(
+          create: (context) {
+            final driveService = context.read<GoogleDriveService>();
+            return VideoCacheRepository(
+              googleDriveService: driveService,
+              videoCacheServiceWeb: kIsWeb ? VideoCacheServiceWeb() : null,
             );
           },
         ),
