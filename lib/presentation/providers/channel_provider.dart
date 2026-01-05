@@ -45,7 +45,9 @@ class ChannelProvider extends ChangeNotifier {
 
   /// チャンネルを追加
   Future<bool> addChannel(String userId, String configFileId) async {
-    debugPrint('[ChannelProvider] チャンネル追加開始: userId=$userId, fileId=$configFileId');
+    debugPrint(
+      '[ChannelProvider] チャンネル追加開始: userId=$userId, fileId=$configFileId',
+    );
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -77,7 +79,8 @@ class ChannelProvider extends ChangeNotifier {
       debugPrint('[ChannelProvider] PermissionDeniedException: $e');
       debugPrint('[ChannelProvider] スタックトレース: $stackTrace');
       _isLoading = false;
-      _errorMessage = 'ファイルへのアクセス権限がありません。\n'
+      _errorMessage =
+          'ファイルへのアクセス権限がありません。\n'
           'Google Driveの共有設定を確認してください。';
       notifyListeners();
       return false;
@@ -94,7 +97,16 @@ class ChannelProvider extends ChangeNotifier {
       debugPrint('[ChannelProvider] InvalidConfigException: ${e.message}');
       debugPrint('[ChannelProvider] スタックトレース: $stackTrace');
       _isLoading = false;
-      _errorMessage = '設定ファイルの形式が正しくありません。\n${e.message}';
+
+      // フォルダ内に動画ファイルがない場合の特別なメッセージ
+      if (e.message.contains('動画ファイルが見つかりませんでした')) {
+        _errorMessage =
+            'フォルダ内に動画ファイルが見つかりませんでした。\n'
+            '対応形式: mp4, webm, mov, avi, mkv';
+      } else {
+        _errorMessage = '設定ファイルの形式が正しくありません。\n${e.message}';
+      }
+
       notifyListeners();
       return false;
     } on Exception catch (e, stackTrace) {
@@ -171,7 +183,8 @@ class ChannelProvider extends ChangeNotifier {
       debugPrint('[ChannelProvider] PermissionDeniedException: $e');
       debugPrint('[ChannelProvider] スタックトレース: $stackTrace');
       _isLoading = false;
-      _errorMessage = 'ファイルへのアクセス権限がありません。\n'
+      _errorMessage =
+          'ファイルへのアクセス権限がありません。\n'
           'Google Driveの共有設定を確認してください。';
       notifyListeners();
     } on FileNotFoundException catch (e, stackTrace) {

@@ -149,7 +149,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   /// 動画詳細画面への遷移時に視聴開始情報を記録
   Future<void> _recordViewStart() async {
-    if (!mounted || _videoController == null || !_videoController!.value.isInitialized) {
+    if (!mounted ||
+        _videoController == null ||
+        !_videoController!.value.isInitialized) {
       return;
     }
 

@@ -97,4 +97,31 @@ class ChannelModel {
       lastFetchedAt: lastFetchedAt,
     );
   }
+
+  /// コピーを作成（一部のフィールドを変更）
+  ChannelModel copyWith({
+    String? id,
+    String? userId,
+    String? name,
+    String? description,
+    String? thumbnailFileId,
+    String? configFileId,
+    DateTime? configLastUpdated,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? lastFetchedAt,
+  }) {
+    return ChannelModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      thumbnailFileId: thumbnailFileId ?? this.thumbnailFileId,
+      configFileId: configFileId ?? this.configFileId,
+      configLastUpdated: configLastUpdated ?? this.configLastUpdated,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastFetchedAt: lastFetchedAt ?? this.lastFetchedAt,
+    );
+  }
 }

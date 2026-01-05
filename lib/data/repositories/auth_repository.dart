@@ -14,9 +14,9 @@ class AuthRepository {
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
-  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
@@ -101,8 +101,10 @@ class AuthRepository {
       }
 
       // OAuthCredentialからアクセストークンを取得（Web版のみ）
-      if (kIsWeb && userCredential.credential is firebase_auth.OAuthCredential) {
-        final oauthCredential = userCredential.credential! as firebase_auth.OAuthCredential;
+      if (kIsWeb &&
+          userCredential.credential is firebase_auth.OAuthCredential) {
+        final oauthCredential =
+            userCredential.credential! as firebase_auth.OAuthCredential;
         _webAccessToken = oauthCredential.accessToken;
         print('[AuthRepository] Web版アクセストークン保存: ${_webAccessToken != null}');
       }

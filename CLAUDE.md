@@ -23,7 +23,7 @@ Feedivoは「Google Driveをポッドキャストのように楽しむ」とい�
 
 ## 🎯 現在の開発状態
 
-### Phase 1-4完了（プロダクション準備完了）
+### Phase 1-5完了（プロダクション準備完了）
 
 | Phase | 状態 | 主要機能 |
 |-------|------|---------|
@@ -31,14 +31,19 @@ Feedivoは「Google Driveをポッドキャストのように楽しむ」とい�
 | Phase 2 | ✅ 完了 | チャンネル管理、動画再生、視聴位置保存 |
 | Phase 3 | ✅ 完了 | 視聴履歴、Analytics、オフライン対応 |
 | Phase 4 | ✅ 完了 | パフォーマンス最適化、エラーハンドリング統一 |
+| Phase 5 | ✅ 完了 | チャンネル登録柔軟化（フォルダURL対応、複数動画形式） |
 
-**詳細**: `docs/archive/implementation-history.md`
+**詳細**: `docs/archive/implementation-history.md`, `docs/migration/flexible-channel-registration.md`
 
 ### 実装済み機能
 
 #### コア機能
 - ✅ Google認証（Firebase Authentication）
 - ✅ チャンネル追加・管理・削除
+  - ✅ **フォルダURL対応**: Google DriveのフォルダURLを直接指定可能
+  - ✅ **JSON自動検出**: フォルダ内の`channel_config.json`を自動検出
+  - ✅ **自動チャンネル生成**: JSONがない場合、フォルダから自動生成
+  - ✅ **複数動画形式サポート**: mp4, webm, mov, avi, mkvなど
 - ✅ 動画リスト表示
 - ✅ 動画再生（再生速度変更対応）
 - ✅ 視聴位置の保存・復元
@@ -48,6 +53,9 @@ Feedivoは「Google Driveをポッドキャストのように楽しむ」とい�
 - ✅ Firebase Analytics統合
 - ✅ オフライン対応（SQLiteキャッシュ）
 - ✅ バックグラウンド再生インフラ（iOS/Android設定済み）
+- ✅ 柔軟なチャンネル登録（Phase 5）
+  - ✅ フォルダURL、ファイルURL、共有URLに対応
+  - ✅ 動画ファイル自動検出（複数形式）
 
 #### 品質・最適化
 - ✅ 画像キャッシュ最適化（CachedNetworkImage）
@@ -194,14 +202,14 @@ Presentation層: Provider、画面、ウィジェット（UI）
 - VideoPlayerScreenへの完全統合は未実施（技術的複雑度が高い）
 - 詳細: `docs/archive/phase3-4-background-playback.md`
 
-### 将来の拡張候補（Phase 5+）
+### 将来の拡張候補（Phase 6+）
 
 #### 追加機能
 - [ ] プレイリスト機能
 - [ ] 検索機能（チャンネル・動画）
 - [ ] コメント機能
 - [ ] 通知機能（新動画アップロード）
-- [ ] Google Picker API統合（チャンネル追加UX改善）
+- [ ] Google Picker API統合（チャンネル追加UXのさらなる改善）
 
 #### バックグラウンド再生完全統合（Phase 3-4b）
 - [ ] VideoPlayerScreenの書き換え
@@ -230,6 +238,9 @@ Presentation層: Provider、画面、ウィジェット（UI）
 - `docs/archive/implementation-history.md` - Phase 1-4の詳細実装履歴
 - `docs/archive/phase4-completion-summary.md` - Phase 4完了サマリー
 - `docs/archive/phase3-4-background-playback.md` - バックグラウンド再生実装状況
+
+### 移行ガイド
+- `docs/migration/flexible-channel-registration.md` - チャンネル登録柔軟化の実装計画と移行パス（Phase 5）
 
 ### デザイン
 - `docs/visual_design.md` - ビジュアルデザインガイド

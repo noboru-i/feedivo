@@ -38,4 +38,12 @@ class GoogleDriveRepository {
   String extractFileId(String input) {
     return _driveService.extractFileId(input);
   }
+
+  Future<bool> isFolder(String fileId) {
+    return _driveService.isFolder(fileId);
+  }
+
+  Future<String> getFolderName(String folderId) {
+    return _driveService.getFolderName(folderId);
+  }
 }

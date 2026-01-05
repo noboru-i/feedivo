@@ -71,8 +71,9 @@ class VideoModel {
       'thumbnailFileId': thumbnailFileId,
       'duration': duration,
       'publishedAt': Timestamp.fromDate(publishedAt),
-      'lastViewedAt':
-          lastViewedAt != null ? Timestamp.fromDate(lastViewedAt!) : null,
+      'lastViewedAt': lastViewedAt != null
+          ? Timestamp.fromDate(lastViewedAt!)
+          : null,
     };
   }
 

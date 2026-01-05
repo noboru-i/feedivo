@@ -32,10 +32,19 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
       return 'File IDまたはURLを入力してください';
     }
 
-    // URLの場合は/d/の後にFile IDがあるかチェック
+    // URLの場合は複数パターンに対応
     if (value.contains('drive.google.com')) {
-      final regex = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-      if (!regex.hasMatch(value)) {
+      // パターン1: /d/FILE_ID
+      // パターン2: /drive/folders/FOLDER_ID
+      // パターン3: /open?id=FILE_ID
+      final patterns = [
+        RegExp(r'/d/([a-zA-Z0-9_-]+)'),
+        RegExp(r'/drive/folders/([a-zA-Z0-9_-]+)'),
+        RegExp(r'/open\?id=([a-zA-Z0-9_-]+)'),
+      ];
+
+      final hasMatch = patterns.any((pattern) => pattern.hasMatch(value));
+      if (!hasMatch) {
         return '有効なGoogle Drive URLではありません';
       }
     } else {
@@ -120,7 +129,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
 
               // 説明テキスト
               Text(
-                'Google Driveの設定ファイルIDまたは\n共有URLを入力してください',
+                'Google Driveのファイル・フォルダのIDまたは\n共有URLを入力してください',
                 style: AppTypography.body1.copyWith(
                   color: AppColors.secondaryText,
                 ),
@@ -134,8 +143,8 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                 controller: _fileIdController,
                 enabled: !_isAdding,
                 decoration: InputDecoration(
-                  labelText: 'File IDまたはURL',
-                  hintText: 'https://drive.google.com/file/d/...',
+                  labelText: 'File ID / Folder ID / URL',
+                  hintText: 'ファイルURL、フォルダURL、またはIDを貼り付け',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
@@ -158,7 +167,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
 
               // ヘルプテキスト
               Text(
-                'Google Driveの共有リンクまたはFile IDを貼り付けてください',
+                'JSONファイル、フォルダURL、またはIDを貼り付けてください',
                 style: AppTypography.caption.copyWith(
                   color: AppColors.disabledText,
                 ),
@@ -228,7 +237,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                       ),
                       const SizedBox(height: AppDimensions.spacingS),
                       Text(
-                        '設定ファイルはJSON形式で作成し、Google Driveで共有設定を行ってください。詳しい手順はドキュメントを参照してください。',
+                        '設定ファイル（JSON形式）またはフォルダのURLを入力できます。フォルダの場合は、配下の動画ファイルが自動的に検出されます。詳しい手順はドキュメントを参照してください。',
                         style: AppTypography.caption.copyWith(
                           color: AppColors.secondaryText,
                         ),

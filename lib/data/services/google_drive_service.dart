@@ -44,7 +44,9 @@ class GoogleDriveService {
         }
 
         final accessToken = _webAccessTokenProvider();
-        debugPrint('[GoogleDriveService] Web版アクセストークン: ${accessToken != null ? "存在する" : "null"}');
+        debugPrint(
+          '[GoogleDriveService] Web版アクセストークン: ${accessToken != null ? "存在する" : "null"}',
+        );
 
         if (accessToken == null || accessToken.isEmpty) {
           debugPrint('[GoogleDriveService] エラー: Web版アクセストークンがnullまたは空');
@@ -54,7 +56,9 @@ class GoogleDriveService {
           );
         }
 
-        debugPrint('[GoogleDriveService] Web版: アクセストークン取得成功 (長さ: ${accessToken.length})');
+        debugPrint(
+          '[GoogleDriveService] Web版: アクセストークン取得成功 (長さ: ${accessToken.length})',
+        );
         return accessToken;
       }
 
@@ -72,8 +76,12 @@ class GoogleDriveService {
         'https://www.googleapis.com/auth/drive.readonly',
       ]);
 
-      debugPrint('[GoogleDriveService] authorization取得: ${authorization != null}');
-      debugPrint('[GoogleDriveService] accessToken: ${authorization?.accessToken != null ? "存在する" : "null"}');
+      debugPrint(
+        '[GoogleDriveService] authorization取得: ${authorization != null}',
+      );
+      debugPrint(
+        '[GoogleDriveService] accessToken: ${authorization?.accessToken != null ? "存在する" : "null"}',
+      );
 
       final accessToken = authorization?.accessToken;
 
@@ -86,7 +94,9 @@ class GoogleDriveService {
         );
       }
 
-      debugPrint('[GoogleDriveService] モバイル版: アクセストークン取得成功 (長さ: ${accessToken.length})');
+      debugPrint(
+        '[GoogleDriveService] モバイル版: アクセストークン取得成功 (長さ: ${accessToken.length})',
+      );
       return accessToken;
     } on UnauthorizedException catch (e) {
       // UnauthorizedExceptionはそのまま再スロー
@@ -136,7 +146,9 @@ class GoogleDriveService {
 
       _handleHttpError(response, fileId);
 
-      debugPrint('[GoogleDriveService] ファイルダウンロード成功 (Bytes): $fileId, サイズ: ${response.bodyBytes.length} bytes');
+      debugPrint(
+        '[GoogleDriveService] ファイルダウンロード成功 (Bytes): $fileId, サイズ: ${response.bodyBytes.length} bytes',
+      );
       return response.bodyBytes;
     } on Exception catch (e, stackTrace) {
       debugPrint('[GoogleDriveService] ファイルダウンロード失敗 (Bytes): $fileId');
@@ -165,7 +177,9 @@ class GoogleDriveService {
       _handleHttpError(response, fileId);
 
       final metadata = json.decode(response.body) as Map<String, dynamic>;
-      debugPrint('[GoogleDriveService] メタデータ取得成功: $fileId, name: ${metadata['name']}');
+      debugPrint(
+        '[GoogleDriveService] メタデータ取得成功: $fileId, name: ${metadata['name']}',
+      );
       return metadata;
     } on Exception catch (e, stackTrace) {
       debugPrint('[GoogleDriveService] メタデータ取得失敗: $fileId');
@@ -208,7 +222,9 @@ class GoogleDriveService {
       );
 
       if (response.statusCode != 200) {
-        debugPrint('[GoogleDriveService] フォルダ内ファイル一覧取得失敗: ${response.statusCode}');
+        debugPrint(
+          '[GoogleDriveService] フォルダ内ファイル一覧取得失敗: ${response.statusCode}',
+        );
         throw DriveApiException(
           'フォルダ内のファイル一覧取得に失敗しました: ${response.statusCode}',
           statusCode: response.statusCode,
@@ -234,7 +250,10 @@ class GoogleDriveService {
   }
 
   /// URLまたはFile IDからFile IDを抽出
-  /// 共有URL例: https://drive.google.com/file/d/FILE_ID/view
+  /// サポートされるURL形式:
+  /// - ファイル: https://drive.google.com/file/d/FILE_ID/view
+  /// - フォルダ: https://drive.google.com/drive/folders/FOLDER_ID
+  /// - 共有: https://drive.google.com/open?id=FILE_ID
   String extractFileId(String input) {
     // すでにFile IDの形式の場合はそのまま返す
     final fileIdPattern = RegExp(r'^[a-zA-Z0-9_-]{20,}$');
@@ -242,15 +261,64 @@ class GoogleDriveService {
       return input;
     }
 
-    // URLからFile IDを抽出
-    final urlPattern = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-    final match = urlPattern.firstMatch(input);
-    if (match != null) {
-      return match.group(1)!;
+    // パターン1: /d/FILE_ID (既存)
+    final filePattern = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+    final fileMatch = filePattern.firstMatch(input);
+    if (fileMatch != null) {
+      return fileMatch.group(1)!;
+    }
+
+    // パターン2: /drive/folders/FOLDER_ID (新規)
+    final folderPattern = RegExp(r'/drive/folders/([a-zA-Z0-9_-]+)');
+    final folderMatch = folderPattern.firstMatch(input);
+    if (folderMatch != null) {
+      return folderMatch.group(1)!;
+    }
+
+    // パターン3: /open?id=FILE_ID (新規)
+    final openPattern = RegExp(r'/open\?id=([a-zA-Z0-9_-]+)');
+    final openMatch = openPattern.firstMatch(input);
+    if (openMatch != null) {
+      return openMatch.group(1)!;
     }
 
     // マッチしない場合はそのまま返す（エラーは呼び出し側で処理）
     return input;
+  }
+
+  /// フォルダかファイルかを判別
+  Future<bool> isFolder(String fileId) async {
+    try {
+      debugPrint('[GoogleDriveService] フォルダ判別開始: $fileId');
+      final metadata = await getFileMetadata(fileId);
+      final mimeType = metadata['mimeType'] as String?;
+      final result = mimeType == 'application/vnd.google-apps.folder';
+      debugPrint(
+        '[GoogleDriveService] フォルダ判別結果: $fileId -> ${result ? "フォルダ" : "ファイル"}',
+      );
+      return result;
+    } on Exception catch (e, stackTrace) {
+      debugPrint('[GoogleDriveService] フォルダ判別失敗: $fileId');
+      debugPrint('[GoogleDriveService] エラー: $e');
+      debugPrint('[GoogleDriveService] スタックトレース: $stackTrace');
+      return false;
+    }
+  }
+
+  /// フォルダ名を取得
+  Future<String> getFolderName(String folderId) async {
+    try {
+      debugPrint('[GoogleDriveService] フォルダ名取得開始: $folderId');
+      final metadata = await getFileMetadata(folderId);
+      final name = metadata['name'] as String? ?? 'Untitled Folder';
+      debugPrint('[GoogleDriveService] フォルダ名取得成功: $folderId -> $name');
+      return name;
+    } on Exception catch (e, stackTrace) {
+      debugPrint('[GoogleDriveService] フォルダ名取得失敗: $folderId');
+      debugPrint('[GoogleDriveService] エラー: $e');
+      debugPrint('[GoogleDriveService] スタックトレース: $stackTrace');
+      rethrow;
+    }
   }
 
   /// HTTPレスポンスのエラーハンドリング

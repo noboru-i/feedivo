@@ -35,7 +35,8 @@ class ChannelConfigModel {
       return ChannelConfigModel(
         version: version,
         channelInfo: ChannelInfoModel.fromJson(channelData),
-        videos: videosData
+        videos:
+            videosData
                 ?.map((v) => VideoInfoModel.fromJson(v as Map<String, dynamic>))
                 .toList() ??
             [],

@@ -10,8 +10,8 @@ class VideoRepository {
   VideoRepository({
     required FirebaseFirestore firestore,
     required firebase_auth.FirebaseAuth firebaseAuth,
-  })  : _firestore = firestore,
-        _firebaseAuth = firebaseAuth;
+  }) : _firestore = firestore,
+       _firebaseAuth = firebaseAuth;
 
   final FirebaseFirestore _firestore;
   final firebase_auth.FirebaseAuth _firebaseAuth;
