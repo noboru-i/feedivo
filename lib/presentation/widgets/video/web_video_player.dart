@@ -48,6 +48,8 @@ class WebVideoPlayerController {
     this.autoPlay = false,
   }) {
     _viewType = 'video-player-${_nextViewId++}';
+    // コンストラクタでvideoエレメントを登録
+    _registerVideoElement();
   }
 
   final String videoUrl;
@@ -79,7 +81,8 @@ class WebVideoPlayerController {
   double get playbackSpeed => _playbackSpeed;
 
   void _attach() {
-    _registerVideoElement();
+    // VideoElementは既にコンストラクタで登録済み
+    // ここでは何もしない
   }
 
   void _detach() {
@@ -88,6 +91,8 @@ class WebVideoPlayerController {
   }
 
   void _registerVideoElement() {
+    debugPrint('[WebVideoPlayerController] VideoElement登録開始: $videoUrl');
+
     // VideoElementを作成
     _videoElement = web.document.createElement('video') as web.HTMLVideoElement
       ..src = videoUrl
@@ -100,6 +105,7 @@ class WebVideoPlayerController {
     _videoElement!.addEventListener(
       'loadedmetadata',
       (web.Event _) {
+        debugPrint('[WebVideoPlayerController] loadedmetadataイベント受信');
         _duration = Duration(
           milliseconds: (_videoElement!.duration * 1000).toInt(),
         );
@@ -163,13 +169,18 @@ class WebVideoPlayerController {
   }
 
   Future<void> initialize() async {
+    debugPrint('[WebVideoPlayerController] initialize開始');
+
     // HTML VideoElementの場合、loadedmetadataイベントで初期化完了
     if (_isInitialized) {
+      debugPrint('[WebVideoPlayerController] 既に初期化済み');
       return;
     }
 
+    debugPrint('[WebVideoPlayerController] loadedmetadataイベントを待機中...');
     // 初期化完了を待つ
     await onInitialized.first;
+    debugPrint('[WebVideoPlayerController] initialize完了');
   }
 
   Future<void> play() async {
