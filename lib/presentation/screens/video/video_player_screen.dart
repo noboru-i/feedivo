@@ -17,7 +17,8 @@ import '../../../domain/entities/video.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/playback_provider.dart';
 import '../../widgets/video/playback_speed_selector.dart';
-import '../../widgets/video/web_video_player.dart';
+import '../../widgets/video/web_video_player_stub.dart'
+    if (dart.library.js_interop) '../../widgets/video/web_video_player.dart';
 
 /// 動画再生画面
 /// Google Driveから動画をストリーミング再生

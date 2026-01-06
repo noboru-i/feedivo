@@ -17,7 +17,7 @@ import 'data/repositories/playback_repository.dart';
 import 'data/repositories/video_cache_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/services/google_drive_service.dart';
-import 'data/services/video_cache_service_web.dart';
+import 'data/services/video_cache_service.dart';
 import 'domain/entities/channel.dart';
 import 'domain/entities/video.dart';
 import 'firebase_options.dart';
@@ -68,13 +68,6 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthRepository(),
         ),
 
-        // Phase 1: AuthProvider
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(
-            context.read<AuthRepository>(),
-          ),
-        ),
-
         // Phase 2: Repositories - Base Dependencies
         // GoogleDriveService（VideoCacheRepositoryでも使用するため、先に作成）
         Provider<GoogleDriveService>(
@@ -98,6 +91,7 @@ class MyApp extends StatelessWidget {
         ),
 
         // VideoCacheRepository（Web版のみ動画キャッシュ機能を使用）
+        // AuthProviderでも使用するため、AuthProviderより前に作成
         Provider<VideoCacheRepository>(
           create: (context) {
             final driveService = context.read<GoogleDriveService>();
@@ -106,6 +100,14 @@ class MyApp extends StatelessWidget {
               videoCacheServiceWeb: kIsWeb ? VideoCacheServiceWeb() : null,
             );
           },
+        ),
+
+        // Phase 1: AuthProvider
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(
+            context.read<AuthRepository>(),
+            context.read<VideoCacheRepository>(),
+          ),
         ),
 
         // Phase 3: Analytics

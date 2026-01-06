@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../services/google_drive_service.dart';
-import '../services/video_cache_service_web.dart';
+import '../services/video_cache_service.dart';
 
 /// 動画キャッシュリポジトリ
 /// プラットフォーム分岐（Web/モバイル）とキャッシュ戦略を管理
