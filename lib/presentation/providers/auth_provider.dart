@@ -3,15 +3,20 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../data/repositories/auth_repository.dart';
+import '../../data/repositories/video_cache_repository.dart';
 import '../../domain/entities/user.dart';
 
 /// 認証状態を管理するProvider
 /// ChangeNotifierを使用してUIに状態変更を通知
 class AuthProvider extends ChangeNotifier {
-  AuthProvider(this._authRepository) {
+  AuthProvider(
+    this._authRepository,
+    this._videoCacheRepository,
+  ) {
     _initialize();
   }
   final AuthRepository _authRepository;
+  final VideoCacheRepository _videoCacheRepository;
 
   User? _currentUser;
   bool _isLoading = false;
@@ -112,6 +117,18 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Web版: IndexedDBの動画キャッシュをクリア
+      if (kIsWeb) {
+        debugPrint('[AuthProvider] ログアウト時にIndexedDBをクリア');
+        try {
+          await _videoCacheRepository.clearCache();
+          debugPrint('[AuthProvider] IndexedDBクリア成功');
+        } on Exception catch (e) {
+          debugPrint('[AuthProvider] IndexedDBクリア失敗（処理は続行）: $e');
+          // キャッシュクリア失敗してもログアウトは続行
+        }
+      }
+
       await _authRepository.signOut();
       _currentUser = null;
       _isLoading = false;
