@@ -248,15 +248,9 @@ cat firebase.json | grep "project"
 2. DNSレコードを設定
 3. **Enforce HTTPS** を有効化
 
-### Web設定ファイルの準備
+### Web設定ファイルについて
 
-`web/index.html.template`が存在する場合、Firebase設定を含める必要があります：
-
-```bash
-# web/index.htmlの生成（ローカル）
-cp web/index.html.template web/index.html
-# Firebase設定を手動で追加
-```
+`web/index.html`はリポジトリに含まれており、Google Sign-InのクライアントIDが設定済みです。追加の設定は不要です。
 
 ## ワークフローの実行
 

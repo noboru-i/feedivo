@@ -56,7 +56,7 @@ echo ""
 echo "Checking platform-specific configurations..."
 check_file "android/app/build.gradle.kts" "true"
 check_file "ios/Runner.xcodeproj/project.pbxproj" "true"
-check_file "web/index.html.template" "false"
+check_file "web/index.html" "true"
 echo ""
 
 # Check for common issues

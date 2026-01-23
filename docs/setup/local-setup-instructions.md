@@ -54,34 +54,9 @@ flutterfire configure
 - `ios/Runner/GoogleService-Info.plist`
 - `firebase.json`
 
-### 4. Web用設定ファイルの作成
+### 4. iOS用設定ファイルの作成
 
-#### 4-1. index.htmlの作成
-
-テンプレートファイルをコピー:
-
-```bash
-cp web/index.html.template web/index.html
-```
-
-`web/index.html`を開き、以下の行を編集:
-
-```html
-<!-- 変更前 -->
-<meta name="google-signin-client_id" content="YOUR_WEB_CLIENT_ID.apps.googleusercontent.com">
-
-<!-- 変更後: Google Cloud ConsoleのWeb OAuth クライアントIDに置き換え -->
-<meta name="google-signin-client_id" content="943246669976-egeokhqqs5bcqgft3p91h6ksm21mkitn.apps.googleusercontent.com">
-```
-
-**Web OAuth クライアントIDの取得方法**:
-1. Google Cloud Console → APIとサービス → 認証情報
-2. OAuth 2.0 クライアントID の「Web client」を選択
-3. クライアントIDをコピー
-
-### 5. iOS用設定ファイルの作成
-
-#### 5-1. Info.plistの作成
+#### 4-1. Info.plistの作成
 
 テンプレートファイルをコピー:
 
@@ -107,7 +82,7 @@ cp ios/Runner/Info.plist.template ios/Runner/Info.plist
    - クライアントID: `943246669976-uabeaacvimtlk81fvs0vd9j7bef1kn51.apps.googleusercontent.com`
    - Reversed Client ID: `com.googleusercontent.apps.943246669976-uabeaacvimtlk81fvs0vd9j7bef1kn51`
 
-#### 5-2. Podのインストール
+#### 4-2. Podのインストール
 
 ```bash
 cd ios
@@ -115,7 +90,7 @@ pod install
 cd ..
 ```
 
-### 6. Android用設定ファイルの確認
+### 5. Android用設定ファイルの確認
 
 `flutterfire configure`で自動生成された`android/app/google-services.json`が存在することを確認:
 
@@ -125,7 +100,7 @@ ls -la android/app/google-services.json
 
 存在しない場合は、再度`flutterfire configure`を実行してください。
 
-### 7. 動作確認
+### 6. 動作確認
 
 #### Web
 
@@ -158,7 +133,6 @@ flutter run -d android
 ls -la lib/firebase_options.dart
 ls -la android/app/google-services.json
 ls -la ios/Runner/GoogleService-Info.plist
-ls -la web/index.html
 ls -la ios/Runner/Info.plist
 ls -la firebase.json
 ```
@@ -189,7 +163,10 @@ ls -la firebase.json
 
 ### 手動で作成するファイル（テンプレートあり）
 
-- `web/index.html` - Web OAuth クライアントID（`web/index.html.template`から作成）
 - `ios/Runner/Info.plist` - iOS Reversed Client ID（`ios/Runner/Info.plist.template`から作成）
 
 テンプレートファイル（`*.template`）をコピーして、上記の手順に従って編集してください。
+
+### リポジトリに含まれるファイル
+
+- `web/index.html` - Web OAuth クライアントID（公開情報のためリポジトリに含まれる）
