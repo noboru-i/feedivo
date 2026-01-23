@@ -50,6 +50,11 @@ ios/Runner/GoogleService-Info.plist
 android/app/google-services.json
 lib/firebase_options.dart
 
+# Firebase CLI
+.firebase/
+.firebaserc
+firebase-debug.*.log
+
 # Environment variables
 .env
 .env.*
