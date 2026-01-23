@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +7,7 @@ import '../../../config/theme/app_dimensions.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/channel_provider.dart';
+import '../../widgets/token_refresh_dialog.dart';
 
 /// チャンネル追加画面
 /// Google Drive File IDまたはURLを入力してチャンネルを追加
@@ -100,13 +102,24 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
       );
       Navigator.of(context).pop();
     } else {
-      // エラーメッセージはChannelProviderのerrorMessageに設定されている
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(channelProvider.errorMessage ?? 'チャンネルの追加に失敗しました'),
-          backgroundColor: AppColors.errorColor,
-        ),
-      );
+      // Web版: 再認証が必要な場合はダイアログを表示
+      if (kIsWeb && channelProvider.needsReauthentication) {
+        channelProvider.clearReauthenticationRequest();
+        final refreshSuccess = await TokenRefreshDialog.show(context);
+        if (refreshSuccess && mounted) {
+          // 再認証成功後、チャンネル追加を再試行
+          await _handleAddChannel();
+          return;
+        }
+      } else {
+        // エラーメッセージはChannelProviderのerrorMessageに設定されている
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(channelProvider.errorMessage ?? 'チャンネルの追加に失敗しました'),
+            backgroundColor: AppColors.errorColor,
+          ),
+        );
+      }
     }
   }
 

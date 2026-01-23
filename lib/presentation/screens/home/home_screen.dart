@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,7 @@ import '../../providers/channel_provider.dart';
 import '../../widgets/channel_card.dart';
 import '../../widgets/common/error_display.dart';
 import '../../widgets/empty_state_widget.dart';
+import '../../widgets/token_refresh_dialog.dart';
 
 /// ホーム画面（チャンネル一覧）
 /// 登録したチャンネルを一覧表示
@@ -83,6 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     return Consumer<ChannelProvider>(
       builder: (context, channelProvider, child) {
+        // Web版: 再認証が必要な場合はダイアログを表示
+        if (kIsWeb && channelProvider.needsReauthentication) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            channelProvider.clearReauthenticationRequest();
+            final success = await TokenRefreshDialog.show(context);
+            if (success) {
+              // 再認証成功後、チャンネル一覧を再読み込み
+              await _loadChannels();
+            }
+          });
+        }
+
         if (channelProvider.isLoading) {
           return const Center(
             child: CircularProgressIndicator(),

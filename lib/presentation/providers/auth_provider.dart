@@ -23,12 +23,16 @@ class AuthProvider extends ChangeNotifier {
   bool _isInitialized = false;
   String? _errorMessage;
 
+  // Web版: トークンリフレッシュが必要かどうか
+  bool _needsTokenRefresh = false;
+
   // Getters
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
   bool get isAuthenticated => _currentUser != null;
   String? get errorMessage => _errorMessage;
+  bool get needsTokenRefresh => _needsTokenRefresh;
 
   /// 初期化：現在のユーザーを取得し、認証状態の変更を監視
   Future<void> _initialize() async {
@@ -144,6 +148,57 @@ class AuthProvider extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Web版: アクセストークンが期限切れかどうかをチェック
+  bool isAccessTokenExpired() {
+    if (!kIsWeb) {
+      return false;
+    }
+    return _authRepository.isWebAccessTokenExpired();
+  }
+
+  /// Web版: トークンリフレッシュを要求（UIに通知）
+  void requestTokenRefresh() {
+    if (!kIsWeb) {
+      return;
+    }
+    debugPrint('[AuthProvider] トークンリフレッシュを要求');
+    _needsTokenRefresh = true;
+    notifyListeners();
+  }
+
+  /// Web版: トークンリフレッシュフラグをクリア
+  void clearTokenRefreshRequest() {
+    _needsTokenRefresh = false;
+    notifyListeners();
+  }
+
+  /// Web版: アクセストークンをリフレッシュ（再認証ポップアップを表示）
+  Future<bool> refreshAccessToken() async {
+    if (!kIsWeb) {
+      return true;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      debugPrint('[AuthProvider] アクセストークンリフレッシュ開始');
+      await _authRepository.refreshWebAccessToken();
+      _needsTokenRefresh = false;
+      _isLoading = false;
+      notifyListeners();
+      debugPrint('[AuthProvider] アクセストークンリフレッシュ成功');
+      return true;
+    } on Exception catch (e) {
+      debugPrint('[AuthProvider] アクセストークンリフレッシュ失敗: $e');
+      _isLoading = false;
+      _errorMessage = '再認証に失敗しました: $e';
+      notifyListeners();
+      return false;
+    }
   }
 
   /// Web版: signInWithPopupの結果を処理

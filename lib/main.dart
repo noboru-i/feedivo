@@ -77,6 +77,12 @@ class MyApp extends StatelessWidget {
               googleSignIn: GoogleSignIn.instance,
               httpClient: http.Client(),
               webAccessTokenProvider: authRepo.getWebAccessToken,
+              isTokenExpiredProvider: authRepo.isWebAccessTokenExpired,
+              onTokenExpired: () {
+                // トークン期限切れ時にログ出力
+                // 実際の再認証要求はChannelProviderのエラーハンドリングで行う
+                debugPrint('[main] トークン期限切れを検出');
+              },
             );
           },
         ),

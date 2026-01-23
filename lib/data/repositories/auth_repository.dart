@@ -25,6 +25,9 @@ class AuthRepository {
   // Web版で取得したアクセストークンを保存
   String? _webAccessToken;
 
+  // Web版アクセストークンの有効期限（50分後に設定）
+  DateTime? _webAccessTokenExpiresAt;
+
   Future<User?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
     if (firebaseUser == null) {
@@ -106,7 +109,10 @@ class AuthRepository {
         final oauthCredential =
             userCredential.credential! as firebase_auth.OAuthCredential;
         _webAccessToken = oauthCredential.accessToken;
+        // トークン有効期限を50分後に設定（Google OAuthトークンは約1時間有効）
+        _webAccessTokenExpiresAt = DateTime.now().add(const Duration(minutes: 50));
         print('[AuthRepository] Web版アクセストークン保存: ${_webAccessToken != null}');
+        print('[AuthRepository] トークン有効期限: $_webAccessTokenExpiresAt');
       }
 
       // UserModelに変換
@@ -130,8 +136,67 @@ class AuthRepository {
     return _webAccessToken;
   }
 
+  /// Web版: アクセストークンが期限切れかどうかをチェック
+  bool isWebAccessTokenExpired() {
+    if (!kIsWeb) {
+      return false;
+    }
+    if (_webAccessToken == null || _webAccessTokenExpiresAt == null) {
+      return true;
+    }
+    return DateTime.now().isAfter(_webAccessTokenExpiresAt!);
+  }
+
+  /// Web版: アクセストークンをクリア（期限切れ時にUIから呼び出される）
+  void clearWebAccessToken() {
+    _webAccessToken = null;
+    _webAccessTokenExpiresAt = null;
+    print('[AuthRepository] Web版アクセストークンをクリア');
+  }
+
+  /// Web版: アクセストークンをリフレッシュ（再認証が必要）
+  /// ユーザーインタラクション（ポップアップ）が必要なため、UIから呼び出す
+  Future<void> refreshWebAccessToken() async {
+    if (!kIsWeb) {
+      return;
+    }
+
+    try {
+      print('[AuthRepository] Web版アクセストークンリフレッシュ開始');
+
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      // 再認証用のプロバイダーを作成
+      final provider = firebase_auth.GoogleAuthProvider()
+        ..addScope('https://www.googleapis.com/auth/drive.readonly');
+
+      // reauthenticateWithPopupで再認証
+      final userCredential = await currentUser.reauthenticateWithPopup(provider);
+
+      // 新しいトークンを保存
+      if (userCredential.credential is firebase_auth.OAuthCredential) {
+        final oauthCredential =
+            userCredential.credential! as firebase_auth.OAuthCredential;
+        _webAccessToken = oauthCredential.accessToken;
+        _webAccessTokenExpiresAt = DateTime.now().add(const Duration(minutes: 50));
+        print('[AuthRepository] Web版アクセストークンリフレッシュ成功');
+        print('[AuthRepository] 新しい有効期限: $_webAccessTokenExpiresAt');
+      }
+    } on Exception catch (e) {
+      print('[AuthRepository] Web版アクセストークンリフレッシュ失敗: $e');
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     try {
+      // Web版: トークンをクリア
+      _webAccessToken = null;
+      _webAccessTokenExpiresAt = null;
+
       await Future.wait([
         _firebaseAuth.signOut(),
         _googleSignIn.signOut(),

@@ -17,10 +17,14 @@ class ChannelProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Web版: トークン期限切れによる再認証が必要かどうか
+  bool _needsReauthentication = false;
+
   // Getters
   List<Channel> get channels => _channels;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get needsReauthentication => _needsReauthentication;
 
   /// チャンネル一覧を読み込み
   Future<void> loadChannels(String userId) async {
@@ -34,6 +38,13 @@ class ChannelProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       debugPrint('[ChannelProvider] チャンネル一覧読み込み成功: ${_channels.length}件');
+    } on TokenExpiredException catch (e) {
+      // トークン期限切れの場合は、再認証を促す
+      debugPrint('[ChannelProvider] TokenExpiredException: ${e.message}');
+      _isLoading = false;
+      _needsReauthentication = true;
+      _errorMessage = 'セッションの有効期限が切れました。再認証が必要です。';
+      notifyListeners();
     } on Exception catch (e, stackTrace) {
       debugPrint('[ChannelProvider] チャンネル一覧読み込み失敗: $e');
       debugPrint('[ChannelProvider] スタックトレース: $stackTrace');
@@ -67,6 +78,14 @@ class ChannelProvider extends ChangeNotifier {
       );
 
       return true;
+    } on TokenExpiredException catch (e) {
+      // トークン期限切れの場合は、再認証を促す
+      debugPrint('[ChannelProvider] TokenExpiredException: ${e.message}');
+      _isLoading = false;
+      _needsReauthentication = true;
+      _errorMessage = 'セッションの有効期限が切れました。再認証が必要です。';
+      notifyListeners();
+      return false;
     } on UnauthorizedException catch (e) {
       // 認証エラーの場合は、エラーメッセージをそのまま表示
       debugPrint('[ChannelProvider] UnauthorizedException: ${e.message}');
@@ -172,6 +191,13 @@ class ChannelProvider extends ChangeNotifier {
 
       // Analytics: チャンネル更新
       await _analyticsService.logChannelRefreshed(channelId: channelId);
+    } on TokenExpiredException catch (e) {
+      // トークン期限切れの場合は、再認証を促す
+      debugPrint('[ChannelProvider] TokenExpiredException: ${e.message}');
+      _isLoading = false;
+      _needsReauthentication = true;
+      _errorMessage = 'セッションの有効期限が切れました。再認証が必要です。';
+      notifyListeners();
     } on UnauthorizedException catch (e) {
       // 認証エラーの場合は、エラーメッセージをそのまま表示
       debugPrint('[ChannelProvider] UnauthorizedException: ${e.message}');
@@ -213,6 +239,13 @@ class ChannelProvider extends ChangeNotifier {
   /// エラーメッセージをクリア
   void clearError() {
     _errorMessage = null;
+    _needsReauthentication = false;
+    notifyListeners();
+  }
+
+  /// 再認証フラグをクリア
+  void clearReauthenticationRequest() {
+    _needsReauthentication = false;
     notifyListeners();
   }
 }

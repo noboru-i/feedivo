@@ -13,13 +13,19 @@ class GoogleDriveService {
     required GoogleSignIn googleSignIn,
     http.Client? httpClient,
     String? Function()? webAccessTokenProvider,
+    bool Function()? isTokenExpiredProvider,
+    void Function()? onTokenExpired,
   }) : _googleSignIn = googleSignIn,
        _httpClient = httpClient ?? http.Client(),
-       _webAccessTokenProvider = webAccessTokenProvider;
+       _webAccessTokenProvider = webAccessTokenProvider,
+       _isTokenExpiredProvider = isTokenExpiredProvider,
+       _onTokenExpired = onTokenExpired;
 
   final GoogleSignIn _googleSignIn;
   final http.Client _httpClient;
   final String? Function()? _webAccessTokenProvider;
+  final bool Function()? _isTokenExpiredProvider;
+  final void Function()? _onTokenExpired;
 
   static const String _baseUrl = 'https://www.googleapis.com/drive/v3';
 
@@ -34,6 +40,17 @@ class GoogleDriveService {
       // Web版の場合は、AuthRepositoryから提供されたアクセストークンを使用
       if (kIsWeb) {
         debugPrint('[GoogleDriveService] Web版: AuthRepositoryからアクセストークンを取得');
+
+        // 事前に有効期限をチェック
+        if (_isTokenExpiredProvider != null && _isTokenExpiredProvider()) {
+          debugPrint('[GoogleDriveService] Web版: トークンが期限切れです');
+          // 期限切れコールバックを呼び出し
+          _onTokenExpired?.call();
+          throw TokenExpiredException(
+            'アクセストークンの有効期限が切れました。\n'
+            '再認証が必要です。',
+          );
+        }
 
         if (_webAccessTokenProvider == null) {
           debugPrint('[GoogleDriveService] エラー: webAccessTokenProviderがnull');
@@ -50,9 +67,11 @@ class GoogleDriveService {
 
         if (accessToken == null || accessToken.isEmpty) {
           debugPrint('[GoogleDriveService] エラー: Web版アクセストークンがnullまたは空');
-          throw UnauthorizedException(
-            'Google Driveへのアクセス権限が不足しています。\n'
-            'アプリからログアウトして、再度ログインしてください。',
+          // トークンがnullの場合も期限切れコールバックを呼び出し
+          _onTokenExpired?.call();
+          throw TokenExpiredException(
+            'アクセストークンが見つかりません。\n'
+            '再認証が必要です。',
           );
         }
 
@@ -329,7 +348,12 @@ class GoogleDriveService {
 
     switch (response.statusCode) {
       case 401:
-        throw TokenExpiredException('アクセストークンが無効です');
+        debugPrint('[GoogleDriveService] 401エラー: トークン期限切れ');
+        // Web版の場合、期限切れコールバックを呼び出し
+        if (kIsWeb) {
+          _onTokenExpired?.call();
+        }
+        throw TokenExpiredException('アクセストークンが無効です。再認証が必要です。');
       case 403:
         throw PermissionDeniedException(fileId);
       case 404:
