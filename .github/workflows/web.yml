@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Web App
+  build_and_deploy:
+    name: Build and Deploy Web App
     runs-on: ubuntu-latest
+    environment: prod
 
     steps:
       - name: Checkout repository
@@ -19,9 +20,6 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Flutter version
-        run: flutter --version
-
       - name: Install dependencies
         run: flutter pub get
 
@@ -29,101 +27,15 @@ jobs:
         run: dart pub global activate flutterfire_cli
 
       - name: Configure Firebase
-        env:
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-        run: |
-          flutterfire configure \
-            --project=$FIREBASE_PROJECT_ID \
-            --platforms=web \
-            --yes
+        run: flutterfire configure --project=${{ secrets.FIREBASE_PROJECT_ID }} --platforms=web --yes
 
       - name: Build web app
         run: flutter build web --release --web-renderer canvaskit
-
-      - name: Upload web artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build
-          path: build/web
-          retention-days: 30
-
-  deploy-firebase:
-    name: Deploy to Firebase Hosting
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download web artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build
-          path: build/web
-
-      - name: Create firebase.json
-        run: |
-          cat > firebase.json << 'EOF'
-          {
-            "hosting": {
-              "public": "build/web",
-              "ignore": [
-                "firebase.json",
-                "**/.*",
-                "**/node_modules/**"
-              ],
-              "rewrites": [
-                {
-                  "source": "**",
-                  "destination": "/index.html"
-                }
-              ]
-            }
-          }
-          EOF
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FEEDIVO_PROD }}
           channelId: live
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-
-  deploy-github-pages:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates
-                        # from an appropriate source
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download web artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build
-          path: build/web
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/web
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
