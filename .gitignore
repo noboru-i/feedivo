@@ -74,4 +74,3 @@ settings.local.json
 # OAuth Client IDs and Firebase configuration
 # These files contain project-specific IDs and should be generated per environment
 ios/Runner/Info.plist
-firebase.json
